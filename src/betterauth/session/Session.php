@@ -17,16 +17,28 @@ declare (strict_types=1);
  * 
 **/ 
 
-namespace betterauth\provider\types\file\task;
+namespace betterauth\session;
 
 use betterauth\provider\Account;
+use pocketmine\Player;
 
-class SaveAccountFileAsyncTask extends FileAccountProcessAsyncTask
+class Session
 {
 
-    protected function processAccountAndResult(Account $account, array $safeVarValues)
+    /** @var Player */
+    protected $player;
+
+    /** @var Account */
+    protected $account;
+
+    public function __construct(
+        Player $player,
+        Account $account
+    )
     {
-        $account->save($safeVarValues['file_path']);
+        $this->account = $account;
+        $this->player = $player;
     }
+
     
 }

@@ -50,6 +50,26 @@ class Account extends PlayerPropertyDynamicObject
 
     /**
      * @param string $username
+     * @param string $passwordRaw
+     * @param string $address
+     * @param float $clientId
+     * @return Account
+     */
+    public static function create(string $username, string $passwordRaw, string $address, float $clientId) : Account
+    {
+        $now = microtime(true);
+        return new self(
+            $username,
+            static::encryptPassword($passwordRaw),
+            $address,
+            $clientId,
+            $now,
+            $now
+        );
+    }
+
+    /**
+     * @param string $username
      * @param string $passwordEncrypted
      * @param string $address
      * @param float $clientId

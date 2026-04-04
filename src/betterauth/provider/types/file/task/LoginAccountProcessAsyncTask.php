@@ -24,6 +24,7 @@ declare (strict_types=1);
 namespace betterauth\provider\types\file\task;
 
 use betterauth\provider\Account;
+use betterauth\provider\exception\WrongPasswordException;
 
 class LoginAccountProcessAsyncTask extends FileAccountProcessAsyncTask
 {
@@ -37,6 +38,6 @@ class LoginAccountProcessAsyncTask extends FileAccountProcessAsyncTask
 
     protected function processAccountAndResult(Account $account, array $safeVarValues)
     {
-        return $account->matchPassword($safeVarValues['password']);
+        return $account->matchPassword($safeVarValues['password']) ? true : new WrongPasswordException("Wrong {$account->getUsername()} password");
     }
 }
