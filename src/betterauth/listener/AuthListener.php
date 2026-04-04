@@ -3,7 +3,9 @@
 namespace betterauth\listener;
 
 use betterauth\Loader;
-
+use betterauth\provider\Account;
+use betterauth\session\exception\SessionAlreadyLoggedInException;
+use betterauth\session\Session;
 use betterauth\session\SessionController;
 
 use betterauth\utils\Settings;
@@ -21,6 +23,7 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
+use pocketmine\event\player\PlayerQuitEvent;
 
 final class AuthListener implements Listener
 {
@@ -57,7 +60,22 @@ final class AuthListener implements Listener
     {
         $player = $event->getPlayer();
 
-        
+        Loader::getInstance()->getProvider()->getAccount($player->getName())
+        ->then(
+            function ($result) use ($player) 
+            {
+                if ($result instanceof Account && $result->matchPlayerAddress($player)) 
+                {
+                    try {
+                        SessionController::getInstance()->acceptLogin($player, $result, true);
+
+                    } catch (SessionAlreadyLoggedInException $error) {
+
+                        $player->close('', $this->message->get("already-logged"));
+                    }
+                }
+            }
+        );
     }
 
     public function onMove(PlayerMoveEvent $event) 
@@ -127,6 +145,17 @@ final class AuthListener implements Listener
             {
                 $event->setCancelled(true);
             }
+        }
+    }
+
+    public function onQuit(PlayerQuitEvent $event)
+    {
+        $player = $event->getPlayer();
+
+        $session = $this->session->getSessionByUsername($player->getName());
+        if ($session instanceof Session) 
+        {
+            $session->destroy();
         }
     }
 }

@@ -83,13 +83,13 @@ class Loader extends PluginBase
         $this->loggedOutRoom = LoggedOutRoom::createFromSettings($this->settings, $this);
         
         $this->registerCommands();
+
+        //$this->registerListener(new AuthListener(new SessionController()));
     }
 
     public function setProvider(AccountProvider $provider)
     {
         $this->provider = $provider;
-
-        //$this->registerListener(new AuthListener(new SessionController()));
     }
 
     public function getMessages() : SystemMessages
