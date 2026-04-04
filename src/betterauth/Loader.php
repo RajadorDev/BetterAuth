@@ -29,11 +29,15 @@ use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use SmartCommand\utils\SingletonTrait;
+use betterauth\utils\SystemMessages;
 
 class Loader extends PluginBase
 {
  
     use SingletonTrait;
+
+    /** @var SystemMessages */
+    protected $messages;
  
     public function onLoad()
     {
@@ -46,6 +50,16 @@ class Loader extends PluginBase
         {
             mkdir($dir);
         }
+
+        $this->saveResource('messages.yml');
+        $messagesFilePath = $dir . 'messages.yml';
+
+        $this->messages = SystemMessages::create($messagesFilePath);
+    }
+
+    public function getMessages() : SystemMessages
+    {
+        return $this->messages;
     }
 
     /**
