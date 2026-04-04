@@ -26,6 +26,9 @@ namespace betterauth\provider;
 use betterauth\utils\promise\Promise;
 use pocketmine\Player;
 use betterauth\provider\exception\AuthException;
+use betterauth\provider\exception\AccountAlreadyRegisteredException;
+use betterauth\provider\exception\WrongPasswordException;
+use betterauth\provider\exception\AccountNotFoundException;
 
 interface AccountProvider
 {
@@ -33,7 +36,7 @@ interface AccountProvider
     /**
      * @param Player $player
      * @param string $password
-     * @return Promise<AuthException|Account>
+     * @return Promise<AuthException|AccountNotFoundException|WrongPasswordException|Account>
      */
     public function tryLogin(Player $player, string $password) : Promise;
 
@@ -46,15 +49,15 @@ interface AccountProvider
     /**
      * @param Player $player
      * @param string $password
-     * @return Promise<AuthException|Account>
+     * @return Promise<AuthException|AccountAlreadyRegisteredException|Account>
      */
     public function tryRegister(Player $player, string $password) : Promise;
 
     /**
      * @param string $username
-     * @return Promise<Account|null>
+     * @return Promise<AccountNotFoundException|Account>
      */
-    public function getAccount() : Promise;
+    public function getAccount(string $username) : Promise;
 
 
     /**
@@ -62,5 +65,6 @@ interface AccountProvider
      * @param Account $account
      * @return Promise<AccountNotFoundException|null>
      */
+    public function updateAccount(Account $account) : Promise;
 
 }
