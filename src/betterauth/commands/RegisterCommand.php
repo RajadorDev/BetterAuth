@@ -49,26 +49,24 @@ class RegisterCommand extends SmartCommand
     protected function prepare()
     {
         $this->registerArgument(0, new PasswordArgument('password', true));
-        $this->registerArgument(0, new PasswordArgument('password-confirm', false));
+        $this->registerArgument(1, new PasswordArgument('password-confirm', Loader::getInstance()->getSettings()->needToConfirmPassword()));
         $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
     }
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
         $passwrod = $args->getValue('password');
-        if (Loader::getInstance()->getSettings()->needToConfirmPassword()) {
-            if ($args->has('password-confirm')) {
-                $passwrodConfirm = $args->getValue('password-confirm');
-                if ($passwrod === $passwrodConfirm) {
-                    //TODO: adicionar funcao para registrar
-                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('registered-successfully'));
-                    return;
-                }
-                $sender->sendMessage(Loader::getInstance()->getMessages()->get('passwords-dont-match'));
+        if ($args->has('password-confirm')) {
+            $passwrodConfirm = $args->getValue('password-confirm');
+            if ($passwrod === $passwrodConfirm) {
+                //TODO: adicionar funcao para registrar
+                $sender->sendMessage(Loader::getInstance()->getMessages()->get('registered-successfully'));
                 return;
             }
-            $sender->sendMessage(Loader::getInstance()->getMessages()->get('password-confirm-required'));
+            $sender->sendMessage(Loader::getInstance()->getMessages()->get('passwords-dont-match'));
             return;
         }
+        $sender->sendMessage(Loader::getInstance()->getMessages()->get('password-confirm-required'));
+        return;
     }
 }
