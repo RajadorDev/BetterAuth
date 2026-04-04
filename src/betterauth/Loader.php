@@ -24,6 +24,8 @@ declare (strict_types=1);
 namespace betterauth;
 
 use betterauth\utils\Settings;
+use Betterauth\Commands\LoginCommand;
+use Betterauth\Commands\RegisterCommand;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
@@ -77,4 +79,9 @@ class Loader extends PluginBase
         Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
     }
 
+    public function registerCommands() {
+        $cm = $this->getServer()->getCommandMap();
+        $cm->register('register', new RegisterCommand());
+        $cm->register('login', new LoginCommand());
+    }
 }

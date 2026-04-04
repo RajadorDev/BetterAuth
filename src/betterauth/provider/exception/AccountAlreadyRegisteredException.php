@@ -21,49 +21,7 @@ declare (strict_types=1);
  * 
 **/
 
-namespace betterauth\session;
+namespace betterauth\provider\exception;
 
-use pocketmine\Player;
-use SmartCommand\utils\SingletonTrait;
-
-final class SessionController 
-{
-
-    use SingletonTrait;
-
-    /** @var array<string,Session> */
-    protected $sessionsByName = [];
-
-    /** @var array<int,Session> */
-    protected $sessionsPerLoaderId = [];
-
-    /**
-     * @param Player $player
-     * @return boolean
-     */
-    public function isLoggedIn(Player $player) : bool
-    {
-        
-    }
-
-    /**
-     * TODO
-     * @param Player $player
-     * @return Session|null
-     */
-    public function getPlayerSession(Player $player)
-    {
-        return $this->sessionsPerLoaderId[$player->getLoaderId()] ?? null;
-    }
-
-    /**
-     * @param string $username
-     * @return Session|null
-     */
-    public function getSessionByUsername(string $username)
-    {
-        return $this->sessionsByName[strtolower($username)] ?? null;
-    }
-
-
-}
+class AccountAlreadyRegisteredException extends AuthException
+{}

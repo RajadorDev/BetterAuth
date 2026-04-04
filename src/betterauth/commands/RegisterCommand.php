@@ -1,7 +1,7 @@
 <?php
 
-declare (strict_types=1);
- 
+declare(strict_types=1);
+
 /***
  * 
  * ██████╗ ███████╗████████╗████████╗███████╗██████╗      █████╗ ██╗   ██╗████████╗██╗  ██╗
@@ -19,51 +19,40 @@ declare (strict_types=1);
  * 
  * NATANBX0: https://github.com/NATANBX0
  * 
-**/
+ **/
 
-namespace betterauth\session;
+namespace Betterauth\Commands;
 
-use pocketmine\Player;
-use SmartCommand\utils\SingletonTrait;
+use betterauth\command\rule\NotLoggedInCommandRule;
+use Betterauth\Commands\Arguments\PasswordArgument;
+use pocketmine\command\CommandSender;
+use SmartCommand\command\CommandArguments;
+use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
+use SmartCommand\command\SmartCommand;
+use SmartCommand\utils\MemberPermissionTrait;
 
-final class SessionController 
+class RegisterCommand extends SmartCommand
 {
-
-    use SingletonTrait;
-
-    /** @var array<string,Session> */
-    protected $sessionsByName = [];
-
-    /** @var array<int,Session> */
-    protected $sessionsPerLoaderId = [];
-
-    /**
-     * @param Player $player
-     * @return boolean
-     */
-    public function isLoggedIn(Player $player) : bool
+    use MemberPermissionTrait;
+    public function __construct()
     {
-        
+        return parent::__construct(
+            'register',
+            'register in ther server',
+            '/register <password>',
+            ['registrar'],
+            $messages = null
+        );
     }
 
-    /**
-     * TODO
-     * @param Player $player
-     * @return Session|null
-     */
-    public function getPlayerSession(Player $player)
+    protected function prepare()
     {
-        return $this->sessionsPerLoaderId[$player->getLoaderId()] ?? null;
+        $this->registerArgument(0, new PasswordArgument('password', true));
+        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
     }
 
-    /**
-     * @param string $username
-     * @return Session|null
-     */
-    public function getSessionByUsername(string $username)
+    protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
-        return $this->sessionsByName[strtolower($username)] ?? null;
+
     }
-
-
 }
