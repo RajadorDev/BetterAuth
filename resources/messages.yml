@@ -1,7 +1,7 @@
 ---
 generic-error: "§cOcorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
 interation-not-logged: "§7Você precisa logar para interagir ou se mover"
-interation-not-logged: "§fVocê precisa logar para interagir ou se mover"
 screen-cant-join: "§fJá existe uma sessão com o username §e\"{player_name}\""
 login-sucessfully: "§fLogado com sucesso"
+already-logged: "§fVocê já está logado"
 ...
