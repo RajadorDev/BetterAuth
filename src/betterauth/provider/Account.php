@@ -25,6 +25,7 @@ namespace betterauth\provider;
 
 use betterauth\utils\DynamicObject;
 use betterauth\utils\PlayerPropertyDynamicObject;
+use pocketmine\Player;
 
 class Account extends PlayerPropertyDynamicObject
 {
@@ -47,6 +48,26 @@ class Account extends PlayerPropertyDynamicObject
 
     /** @var float */
     protected $clientId, $lastLoginAt, $createdAt;
+
+    /**
+     * @param string $username
+     * @param string $passwordRaw
+     * @param string $address
+     * @param float $clientId
+     * @return Account
+     */
+    public static function create(string $username, string $passwordRaw, string $address, float $clientId) : Account
+    {
+        $now = microtime(true);
+        return new self(
+            $username,
+            static::encryptPassword($passwordRaw),
+            $address,
+            $clientId,
+            $now,
+            $now
+        );
+    }
 
     /**
      * @param string $username
@@ -101,6 +122,11 @@ class Account extends PlayerPropertyDynamicObject
     public function matchPassword(string $passwordRaw) : bool 
     {
         return static::encryptPassword($passwordRaw) === $this->passwordEncrypted;
+    }
+
+    public function matchPlayerAddress(Player $player) : bool 
+    {
+        return $this->address === $player->getAddress();
     }
 
     public function save(string $path)

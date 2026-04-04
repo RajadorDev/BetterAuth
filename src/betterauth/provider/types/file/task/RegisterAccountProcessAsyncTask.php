@@ -21,49 +21,41 @@ declare (strict_types=1);
  * 
 **/
 
-namespace betterauth\session;
+namespace betterauth\provider\types\file\task;
 
-use pocketmine\Player;
-use SmartCommand\utils\SingletonTrait;
+use betterauth\provider\Account;
+use betterauth\provider\exception\AccountAlreadyRegisteredException;
+use betterauth\provider\exception\AuthException;
+use betterauth\utils\async\AsyncPromiseTask;
+use betterauth\utils\DynamicObject;
 
-final class SessionController 
+class RegisterAccountProcessAsyncTask extends AsyncPromiseTask
 {
 
-    use SingletonTrait;
-
-    /** @var array<string,Session> */
-    protected $sessionsByName = [];
-
-    /** @var array<int,Session> */
-    protected $sessionsPerLoaderId = [];
-
-    /**
-     * @param Player $player
-     * @return boolean
-     */
-    public function isLoggedIn(Player $player) : bool
+    public function __construct(string $filePath, Account $account)
     {
-        
+        return parent::__construct(
+            [
+                'file_path' => $filePath,
+                'account' => $account->jsonSerialize()
+            ],
+            true
+        );
     }
 
-    /**
-     * TODO
-     * @param Player $player
-     * @return Session|null
-     */
-    public function getPlayerSession(Player $player)
+    protected function processAndResult(array $safeVarValues)
     {
-        return $this->sessionsPerLoaderId[$player->getLoaderId()] ?? null;
-    }
+        $path = $safeVarValues['file_path'];
 
-    /**
-     * @param string $username
-     * @return Session|null
-     */
-    public function getSessionByUsername(string $username)
-    {
-        return $this->sessionsByName[strtolower($username)] ?? null;
-    }
+        if (file_exists($path)) {
+            return new AccountAlreadyRegisteredException("Account {$path} does not found");
+        }
 
+        $accountData = $safeVarValues['account'];
+
+        $account = DynamicObject::globalUnserialize($accountData);
+
+        return $account;
+    }
 
 }

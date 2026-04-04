@@ -33,7 +33,7 @@ interface AccountProvider
     /**
      * @param Player $player
      * @param string $password
-     * @return Promise<AuthException|true>
+     * @return Promise<AuthException|Account>
      */
     public function tryLogin(Player $player, string $password) : Promise;
 
@@ -46,7 +46,7 @@ interface AccountProvider
     /**
      * @param Player $player
      * @param string $password
-     * @return Promise<AuthException|true>
+     * @return Promise<AuthException|Account>
      */
     public function tryRegister(Player $player, string $password) : Promise;
 
@@ -54,6 +54,14 @@ interface AccountProvider
      * @param string $username
      * @return Promise<Account|null>
      */
-    public function getAccount() : Promise;
-    
+    public function getAccount(string $username) : Promise;
+
+
+    /**
+     * NOTE: This method should not be called to save unregistered accounts!
+     * @param Account $account
+     * @return Promise<AccountNotFoundException|null>
+     */
+    public function updateAccount(Account $account) : Promise;
+
 }

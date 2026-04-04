@@ -26,11 +26,14 @@ namespace betterauth;
 use betterauth\utils\Settings;
 use Betterauth\Commands\LoginCommand;
 use Betterauth\Commands\RegisterCommand;
+use betterauth\provider\AccountProvider;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use SmartCommand\utils\SingletonTrait;
 use betterauth\utils\SystemMessages;
+use betterauth\provider\types\file\FileAccountProvider;
+use SmartCommand\command\SmartCommand;
 
 class Loader extends PluginBase
 {
@@ -42,6 +45,9 @@ class Loader extends PluginBase
 
     /** @var Settings */
     protected $settings;
+
+    /** @var AccountProvider */
+    protected $provider;
  
     public function onLoad()
     {
@@ -62,6 +68,17 @@ class Loader extends PluginBase
 
         $this->messages = SystemMessages::create($messagesFilePath);
         $this->settings = new Settings($this->getConfig());
+
+
+        $accountsFolder = $dir . 'accounts' . DIRECTORY_SEPARATOR;
+        $fileProvider = new FileAccountProvider($accountsFolder);
+        $this->setProvider($fileProvider);
+        $this->registerCommands();
+    }
+
+    public function setProvider(AccountProvider $provider)
+    {
+        $this->provider = $provider;
     }
 
     public function getMessages() : SystemMessages
@@ -74,6 +91,11 @@ class Loader extends PluginBase
         return $this->settings;
     }
 
+    public function getProvider() : AccountProvider
+    {
+        return $this->provider;
+    }
+
     public function registerListener(Listener $listener)
     {
         Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
@@ -83,5 +105,10 @@ class Loader extends PluginBase
         $cm = $this->getServer()->getCommandMap();
         $cm->register('register', new RegisterCommand());
         $cm->register('login', new LoginCommand());
+    }
+
+    public function pushMessagesToCommand(SmartCommand $command) 
+    {
+        $command->getMessages()->add($this->messages->getFile()->getAll());
     }
 }
