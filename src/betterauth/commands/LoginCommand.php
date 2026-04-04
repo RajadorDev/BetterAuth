@@ -25,6 +25,8 @@ namespace Betterauth\Commands;
 
 use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
+use betterauth\Loader;
+use betterauth\session\SessionController;
 use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
@@ -55,6 +57,9 @@ class LoginCommand extends SmartCommand
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
-
+        if (SessionController::getInstance()->isLoggedIn($sender)) {
+            $sender->sendMessage(Loader::getInstance()->getMessages()->get('player-auto-loged-in'));
+            return;
+        }
     }
 }

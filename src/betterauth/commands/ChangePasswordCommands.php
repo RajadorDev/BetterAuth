@@ -21,35 +21,50 @@ declare(strict_types=1);
  * 
  **/
 
-namespace Betterauth\Commands\Arguments;
+namespace Betterauth\Commands;
 
+use betterauth\command\rule\NotLoggedInCommandRule;
+use Betterauth\Commands\Arguments\PasswordArgument;
 use betterauth\Loader;
-use pocketmine\utils\TextFormat;
-use SmartCommand\command\argument\BaseArgument;
+use pocketmine\command\CommandSender;
+use SmartCommand\command\CommandArguments;
+use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
+use SmartCommand\command\SmartCommand;
 use SmartCommand\message\CommandMessages;
+use SmartCommand\utils\MemberPermissionTrait;
 
-class PasswordArgument extends BaseArgument
+class LoginCommand extends SmartCommand
 {
-    public function __construct(string $name, bool $required)
+    public function __construct()
     {
         return parent::__construct(
-            $name,
-            'string',
-            $required,
-            function (&$given) {
-                if (strlen($given) < Loader::getInstance()->getSettings()->getMaxPasswordLength()) {
-                    return false;
-                }
-                if (strlen($given) < Loader::getInstance()->getSettings()->getMinPasswordLength()) {
-                    return false;
-                }
-            }
+            'changepassword',
+            'change your password',
+            '/changepassword <new - password> <confirm - password>',
+            ['changepass'],
+            $messages = null
         );
     }
 
-    public function getWrongMessage(CommandMessages $commandMessages, string $argumentUsed): string
+    use MemberPermissionTrait;
+
+    protected function prepare()
     {
-        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::GRAY . 'Sua senha precisa ter no mínimo ' . TextFormat::RED . ' 8 ' . TextFormat::GRAY . 'caracteres!');
-        return parent::getWrongMessage($commandMessages, $argumentUsed);
+        $this->registerArgument(0, new PasswordArgument('password', true));
+        $this->registerArgument(1, new PasswordArgument('password-confirm', true));
+        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
+    }
+
+    protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
+    {
+        $password = $args->getValue('password');
+        $passwordConfirm = $args->getValue('password-confirm');
+        if ($passwordConfirm === $password) {
+            //TODO: adicionar funcao de trocar senha
+            $sender->sendMessage(Loader::getInstance()->getMessages()->get('password-changed', '{password}', $password));
+            return;
+        }
+        $sender->sendMessage(Loader::getInstance()->getMessages()->get('passwords-dont-match'));
+        return;
     }
 }

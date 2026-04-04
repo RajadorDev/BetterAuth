@@ -1,3 +1,9 @@
 ---
-
+registered-successfully: "Voce foi registrado com sucesso!"
+passwords-dont-match: "As suas palavras passe não se coincidem!"
+password-confirm-required: "Confirme a sua senha: /registrar <senha> <confirmar-senha>"
+player-loged-in-sucessfully: "Logado com sucesso"
+player-auto-loged-in: "Voce foi logado automaticamente por IP"
+login-sucessfully: "Voce foi logado com sucesso"
+change-password: "voce trocou a sua senha nova senha: "
 ...
