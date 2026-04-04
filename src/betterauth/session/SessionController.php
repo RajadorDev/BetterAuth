@@ -23,6 +23,8 @@ declare (strict_types=1);
 
 namespace betterauth\session;
 
+use betterauth\provider\Account;
+use betterauth\session\exception\SessionAlreadyLoggedInException;
 use pocketmine\Player;
 use SmartCommand\utils\SingletonTrait;
 
@@ -43,7 +45,7 @@ final class SessionController
      */
     public function isLoggedIn(Player $player) : bool
     {
-        
+        return isset($this->sessionsPerLoaderId[$player->getLoaderId()]);
     }
 
     /**
@@ -63,6 +65,37 @@ final class SessionController
     public function getSessionByUsername(string $username)
     {
         return $this->sessionsByName[strtolower($username)] ?? null;
+    }
+
+    /**
+     * @param Player $player
+     * @param Account $account
+     * @param boolean $wasLoggedInAutomatically
+     * @return Session
+     * @throws SessionAlreadyLoggedInException
+     */
+    public function acceptLogin(Player $player, Account $account, bool $wasLoggedInAutomatically) : Session
+    {
+        $playerName = $player->getName();
+        $playerName = strtolower($playerName);
+
+        $loaderId = $player->getLoaderId();
+
+        if (isset($this->sessionsByName[$playerName]) || isset($this->sessionsPerLoaderId[$loaderId])) {
+            throw new SessionAlreadyLoggedInException("Session $playerName:$loaderId is already registered");
+        }
+        
+        return 
+        $this->sessionsPerLoaderId[$loaderId]
+        =
+        $this->sessionsByName[$playerName] 
+        = Session::create($player, $account, $wasLoggedInAutomatically);
+    }
+
+    public function logout(Session $session)
+    {
+        unset($this->sessionsPerLoaderId[$session->getPlayer()->getLoaderId()]);
+        unset($this->sessionsByName[strtolower($session->getPlayer()->getName())]);
     }
 
 

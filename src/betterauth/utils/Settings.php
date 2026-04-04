@@ -37,6 +37,16 @@ class Settings
 
     const MESSAGE_EVENTS_COOLDOWN = 'block-alert-cooldown';
 
+    const LOGGOUT_ROOM_PREFIX = 'logged-out-room.';
+
+    const LOGGED_OUT_ROOM_ENABLED = self::LOGGOUT_ROOM_PREFIX . 'enabled';
+
+    const LOGGED_OUT_WORLD = self::LOGGED_OUT_ROOM_ENABLED . 'world';
+
+    const LOGGED_OUT_TARGET_WORLD = self::LOGGOUT_ROOM_PREFIX . 'target-world';
+
+    const LOGGET_OUT_ALLOW_MOVE = self::LOGGOUT_ROOM_PREFIX . 'allow-move';
+
     /** @var Config */
     protected $file;
 
@@ -56,13 +66,16 @@ class Settings
      * @param string $identifier
      * @param boolean $nested
      * @param mixed $default
+     * @param boolean $warnConsoleWhenFail
      * @return mixed
      */
-    public function getValue(string $identifier, bool $nested = false, $default = null)
+    public function getValue(string $identifier, bool $nested = false, $default = null, bool $warnConsoleWhenFail = false)
     {
         $result = $nested ? $this->file->getNested($identifier, null) : $this->file->get($identifier, null);
         if (is_null($result)) {
-            Loader::getInstance()->getLogger()->warning("Setting with id $identifier does not found");
+            if ($warnConsoleWhenFail) {
+                Loader::getInstance()->getLogger()->warning("Setting with id $identifier does not found");
+            }
             return $default;
         }
         return $result;

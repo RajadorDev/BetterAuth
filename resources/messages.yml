@@ -1,3 +1,4 @@
 ---
-interation-not-logged: "§fVocê precisa logar para interagir ou se mover"
+generic-error: "§cOcorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
+interation-not-logged: "§7Você precisa logar para interagir ou se mover"
 ...

@@ -26,9 +26,10 @@ namespace betterauth\provider\types\file;
 use betterauth\provider\Account;
 use betterauth\provider\AccountProvider;
 use betterauth\provider\exception\AccountAlreadyRegisteredException;
+use betterauth\provider\types\file\task\GetAccountFileAsyncTask;
 use betterauth\provider\types\file\task\LoginAccountProcessAsyncTask;
 use betterauth\provider\types\file\task\RegisterAccountProcessAsyncTask;
-use betterauth\provider\types\file\task\SaveAccountFileAsyncTask;
+use betterauth\provider\types\file\task\UpdateAccountProcessAsyncTask;
 use betterauth\utils\promise\Promise;
 use betterauth\utils\promise\PromiseResolver;
 use pocketmine\Player;
@@ -47,6 +48,9 @@ class FileAccountProvider implements AccountProvider
     )
     {
         $this->accountsDir = $dir;
+        if (!file_exists($dir)) {
+            mkdir($dir);
+        }
     }
 
     public function getPlayerFilePath(string $username) : string 
@@ -92,8 +96,28 @@ class FileAccountProvider implements AccountProvider
         $task::schedule($task);
         return $task->getPromise();
     }
-    
 
+    /**
+     * @param string $username
+     * @return Promise<AccountNotFoundException|Account>
+     */
+    public function getAccount(string $username): Promise
+    {
+        $path = $this->getPlayerFilePath($username);
+        $task = new GetAccountFileAsyncTask([], $path);
+        $task::schedule($task);
+        return $task->getPromise();
+    }
+
+    public function updateAccount(Account $account): Promise
+    {
+        $username = $account->getUsername();
+        $path = $this->getPlayerFilePath($username);
+
+        $task = new UpdateAccountProcessAsyncTask($path, $account);
+        $task::schedule($task);
+        return $task->getPromise();
+    }
 
 
 }
