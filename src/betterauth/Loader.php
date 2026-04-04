@@ -23,6 +23,8 @@ declare (strict_types=1);
 
 namespace betterauth;
 
+use betterauth\listener\AuthListener;
+use betterauth\session\SessionController;
 use betterauth\utils\Settings;
 use Betterauth\Commands\LoginCommand;
 use Betterauth\Commands\RegisterCommand;
@@ -62,6 +64,8 @@ class Loader extends PluginBase
 
         $this->messages = SystemMessages::create($messagesFilePath);
         $this->settings = new Settings($this->getConfig());
+
+        //$this->registerListener(new AuthListener(new SessionController()));
     }
 
     public function getMessages() : SystemMessages
