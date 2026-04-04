@@ -1,7 +1,7 @@
 <?php
 
-declare (strict_types=1);
- 
+declare(strict_types=1);
+
 /***
  * 
  * ██████╗ ███████╗████████╗████████╗███████╗██████╗      █████╗ ██╗   ██╗████████╗██╗  ██╗
@@ -19,69 +19,33 @@ declare (strict_types=1);
  * 
  * NATANBX0: https://github.com/NATANBX0
  * 
-**/
+ **/
 
-namespace betterauth;
+namespace Betterauth\Commands\Arguments;
 
-use betterauth\utils\Settings;
-use Betterauth\Commands\LoginCommand;
-use Betterauth\Commands\RegisterCommand;
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use pocketmine\utils\TextFormat;
+use SmartCommand\command\argument\BaseArgument;
+use SmartCommand\message\CommandMessages;
 
-class Loader extends PluginBase
+class PasswordArgument extends BaseArgument
 {
- 
-    use SingletonTrait;
-
-    /** @var SystemMessages */
-    protected $messages;
-
-    /** @var Settings */
-    protected $settings;
- 
-    public function onLoad()
+    public function __construct(string $name, bool $required)
     {
-        self::setInstance($this);
+        return parent::__construct(
+            $name,
+            'string',
+            $required,
+            function (&$given) {
+                if (strlen($given) < 8) {
+                    return false;
+                }
+            }
+        );
     }
 
-    public function onEnable()
+    public function getWrongMessage(CommandMessages $commandMessages, string $argumentUsed): string
     {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
-        }
-
-        $this->saveResource('config.yml');
-        
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
-
-        $this->messages = SystemMessages::create($messagesFilePath);
-        $this->settings = new Settings($this->getConfig());
-    }
-
-    public function getMessages() : SystemMessages
-    {
-        return $this->messages;
-    }
-
-    public function getSettings() : Settings
-    {
-        return $this->settings;
-    }
-
-    public function registerListener(Listener $listener)
-    {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
-    }
-
-    public function registerCommands() {
-        $cm = $this->getServer()->getCommandMap();
-        $cm->register('register', new RegisterCommand());
-        $cm->register('login', new LoginCommand());
+        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::GRAY . 'Sua senha precisa ter no mínimo ' . TextFormat::RED . ' 8 ' . TextFormat::GRAY . 'caracteres!');
+        return parent::getWrongMessage($commandMessages, $argumentUsed);
     }
 }
