@@ -25,6 +25,7 @@ namespace betterauth\provider;
 
 use betterauth\utils\DynamicObject;
 use betterauth\utils\PlayerPropertyDynamicObject;
+use pocketmine\Player;
 
 class Account extends PlayerPropertyDynamicObject
 {
@@ -121,6 +122,11 @@ class Account extends PlayerPropertyDynamicObject
     public function matchPassword(string $passwordRaw) : bool 
     {
         return static::encryptPassword($passwordRaw) === $this->passwordEncrypted;
+    }
+
+    public function matchPlayerAddress(Player $player) : bool 
+    {
+        return $this->address === $player->getAddress();
     }
 
     public function save(string $path)
