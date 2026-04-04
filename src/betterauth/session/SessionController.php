@@ -23,9 +23,13 @@ declare (strict_types=1);
 
 namespace betterauth\session;
 
+use betterauth\event\PlayerLoggedOutEvent;
+use betterauth\event\PlayerLoginSucessfullyEvent;
 use betterauth\provider\Account;
 use betterauth\session\exception\SessionAlreadyLoggedInException;
+use betterauth\utils\SystemUtils;
 use pocketmine\Player;
+use pocketmine\utils\EventUtils;
 use SmartCommand\utils\SingletonTrait;
 
 final class SessionController 
@@ -38,6 +42,11 @@ final class SessionController
 
     /** @var array<int,Session> */
     protected $sessionsPerLoaderId = [];
+
+    public static function init()
+    {
+        self::setInstance(new self);
+    }
 
     /**
      * @param Player $player
@@ -85,17 +94,21 @@ final class SessionController
             throw new SessionAlreadyLoggedInException("Session $playerName:$loaderId is already registered");
         }
         
-        return 
+        $session =
         $this->sessionsPerLoaderId[$loaderId]
         =
         $this->sessionsByName[$playerName] 
         = Session::create($player, $account, $wasLoggedInAutomatically);
+
+        EventUtils::callEvent(new PlayerLoginSucessfullyEvent($player, $session, $wasLoggedInAutomatically));
+        return $session;
     }
 
     public function logout(Session $session)
     {
         unset($this->sessionsPerLoaderId[$session->getPlayer()->getLoaderId()]);
         unset($this->sessionsByName[strtolower($session->getPlayer()->getName())]);
+        SystemUtils::callEvent(new PlayerLoggedOutEvent($session->getPlayer(), $session));
     }
 
 

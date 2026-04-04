@@ -129,6 +129,11 @@ class Account extends PlayerPropertyDynamicObject
         return $this->address === $player->getAddress();
     }
 
+    public function matchAutoLogin(Player $player) : bool 
+    {
+        return ($this->address === $player->getAddress() && $this->clientId === $player->getClientId());
+    }
+
     public function save(string $path)
     {
         file_put_contents(

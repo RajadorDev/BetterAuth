@@ -21,64 +21,42 @@ declare (strict_types=1);
  * 
 **/ 
 
-namespace betterauth\session;
+namespace betterauth\listener;
 
-use betterauth\provider\Account;
-use pocketmine\Player;
+use betterauth\event\PlayerLoggedOutEvent;
+use betterauth\event\PlayerLoginSucessfullyEvent;
+use betterauth\utils\Settings;
+use betterauth\utils\SystemMessages;
+use pocketmine\event\Listener;
 
-class Session
+final class LoginListener implements Listener
 {
 
-    /** @var Player */
-    protected $player;
+    /** @var Settings */
+    protected $settings;
 
-    /** @var Account */
-    protected $account;
-
-    /** @var boolean */
-    protected $loggedInAutomatically;
+    /** @var SystemMessages */
+    protected $messages;
+    
+    public function __construct(Settings $settings, SystemMessages $messages)
+    {
+        $this->settings = $settings;
+        $this->messages = $messages;
+    }
 
     /**
-     * @param Player $player
-     * @param Account $account
-     * @param boolean $loggedInAutomatically
-     * @return Session
+     * @priority LOWEST
      */
-    public static function create(Player $player, Account $account, bool $loggedInAutomatically) : Session
+    public function onLoginSucessfully(PlayerLoginSucessfullyEvent $event)
     {
-        return new self($player, $account, $loggedInAutomatically);
+        $player = $event->getPlayer();
+        $messageId = $event->wasLoggedInAutomatically() ? 'auto-login-sucessfully' : 'login-sucessfully';
+        $this->messages->send($player, $messageId);
     }
 
-    public function __construct(
-        Player $player,
-        Account $account,
-        bool $loggedInAutomatically
-    )
-    {
-        $this->account = $account;
-        $this->player = $player;
-        $this->loggedInAutomatically = $loggedInAutomatically;
-    }
-
-    public function getPlayer() : Player
-    {
-        return $this->player;
-    }
-
-    public function getAccount() : Account
-    {
-        return $this->account;
-    }
-
-    public function wasLoggedInAutomatically() : bool 
-    {
-        return $this->loggedInAutomatically;
-    }
-
-    public function destroy()
-    {
-        SessionController::getInstance()->logout($this);
-    }
-
-
+    /**
+     * @priority LOWEST
+     */
+    public function onLogout(PlayerLoggedOutEvent $event)
+    {}
 }
