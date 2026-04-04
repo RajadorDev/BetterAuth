@@ -3,17 +3,21 @@
 declare (strict_types=1);
  
 /***
+ * 
+ * ██████╗ ███████╗████████╗████████╗███████╗██████╗      █████╗ ██╗   ██╗████████╗██╗  ██╗
+ * ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗    ██╔══██╗██║   ██║╚══██╔══╝██║  ██║
+ * ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝    ███████║██║   ██║   ██║   ███████║
+ * ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗    ██╔══██║██║   ██║   ██║   ██╔══██║
+ * ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║    ██║  ██║╚██████╔╝   ██║   ██║  ██║
+ * ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
  *   
- * Rajador Developer
+ * Created by:
  * 
- * ▒█▀▀█ ░█▀▀█ ░░░▒█ ░█▀▀█ ▒█▀▀▄ ▒█▀▀▀█ ▒█▀▀█ 
- * ▒█▄▄▀ ▒█▄▄█ ░▄░▒█ ▒█▄▄█ ▒█░▒█ ▒█░░▒█ ▒█▄▄▀ 
- * ▒█░▒█ ▒█░▒█ ▒█▄▄█ ▒█░▒█ ▒█▄▄▀ ▒█▄▄▄█ ▒█░▒█
+ * Rajador: https://github.com/RajadorDev
  * 
- * GitHub: https://github.com/rajadordev
+ * Bietio: https://github.com/Bietio
  * 
- * Discord: rajadortv
- * 
+ * NATANBX0: https://github.com/NATANBX0
  * 
 **/ 
 
@@ -33,6 +37,6 @@ class LoginAccountProcessAsyncTask extends FileAccountProcessAsyncTask
 
     protected function processAccountAndResult(Account $account, array $safeVarValues)
     {
-        
+        return $account->matchPassword($safeVarValues['password']);
     }
 }

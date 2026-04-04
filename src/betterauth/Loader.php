@@ -23,6 +23,7 @@ declare (strict_types=1);
 
 namespace betterauth;
 
+use betterauth\utils\Settings;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
@@ -36,6 +37,9 @@ class Loader extends PluginBase
 
     /** @var SystemMessages */
     protected $messages;
+
+    /** @var Settings */
+    protected $settings;
  
     public function onLoad()
     {
@@ -49,10 +53,13 @@ class Loader extends PluginBase
             mkdir($dir);
         }
 
+        $this->saveResource('config.yml');
+        
         $this->saveResource('messages.yml');
         $messagesFilePath = $dir . 'messages.yml';
 
         $this->messages = SystemMessages::create($messagesFilePath);
+        $this->settings = new Settings($this->getConfig());
     }
 
     public function getMessages() : SystemMessages
@@ -60,21 +67,9 @@ class Loader extends PluginBase
         return $this->messages;
     }
 
-    /**
-     * @param string $identifier
-     * @param mixed $defaultValue
-     * @param boolean $warnConsole
-     * @return mixed
-     */
-    public function getConfigValue(string $identifier, $defaultValue = null, bool $warnConsole = true)
+    public function getSettings() : Settings
     {
-        $settings = $this->getConfig();
-        if ($settings->exists($identifier)) {
-            return $settings->get($identifier);
-        } else if ($warnConsole) {
-            $this->getLogger()->warning("Setting with id $identifier does not found!");
-        }
-        return $defaultValue;
+        return $this->settings;
     }
 
     public function registerListener(Listener $listener)
