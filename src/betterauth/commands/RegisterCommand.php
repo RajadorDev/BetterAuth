@@ -1,7 +1,7 @@
 <?php
 
-declare (strict_types=1);
- 
+declare(strict_types=1);
+
 /***
  * 
  * ██████╗ ███████╗████████╗████████╗███████╗██████╗      █████╗ ██╗   ██╗████████╗██╗  ██╗
@@ -19,69 +19,40 @@ declare (strict_types=1);
  * 
  * NATANBX0: https://github.com/NATANBX0
  * 
-**/
+ **/
 
-namespace betterauth;
+namespace Betterauth\Commands;
 
-use betterauth\utils\Settings;
-use Betterauth\Commands\LoginCommand;
-use Betterauth\Commands\RegisterCommand;
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use betterauth\command\rule\NotLoggedInCommandRule;
+use Betterauth\Commands\Arguments\PasswordArgument;
+use pocketmine\command\CommandSender;
+use SmartCommand\command\CommandArguments;
+use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
+use SmartCommand\command\SmartCommand;
+use SmartCommand\utils\MemberPermissionTrait;
 
-class Loader extends PluginBase
+class RegisterCommand extends SmartCommand
 {
- 
-    use SingletonTrait;
-
-    /** @var SystemMessages */
-    protected $messages;
-
-    /** @var Settings */
-    protected $settings;
- 
-    public function onLoad()
+    use MemberPermissionTrait;
+    public function __construct()
     {
-        self::setInstance($this);
+        return parent::__construct(
+            'register',
+            'register in ther server',
+            '/register <password>',
+            ['registrar'],
+            $messages = null
+        );
     }
 
-    public function onEnable()
+    protected function prepare()
     {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
-        }
-
-        $this->saveResource('config.yml');
-        
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
-
-        $this->messages = SystemMessages::create($messagesFilePath);
-        $this->settings = new Settings($this->getConfig());
+        $this->registerArgument(0, new PasswordArgument('password', true));
+        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
     }
 
-    public function getMessages() : SystemMessages
+    protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
-        return $this->messages;
-    }
 
-    public function getSettings() : Settings
-    {
-        return $this->settings;
-    }
-
-    public function registerListener(Listener $listener)
-    {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
-    }
-
-    public function registerCommands() {
-        $cm = $this->getServer()->getCommandMap();
-        $cm->register('register', new RegisterCommand());
-        $cm->register('login', new LoginCommand());
     }
 }
