@@ -1,0 +1,35 @@
+<?php
+
+declare (strict_types=1);
+ 
+/***
+ *   
+ * Rajador Developer
+ * 
+ * ▒█▀▀█ ░█▀▀█ ░░░▒█ ░█▀▀█ ▒█▀▀▄ ▒█▀▀▀█ ▒█▀▀█ 
+ * ▒█▄▄▀ ▒█▄▄█ ░▄░▒█ ▒█▄▄█ ▒█░▒█ ▒█░░▒█ ▒█▄▄▀ 
+ * ▒█░▒█ ▒█░▒█ ▒█▄▄█ ▒█░▒█ ▒█▄▄▀ ▒█▄▄▄█ ▒█░▒█
+ * 
+ * GitHub: https://github.com/rajadordev
+ * 
+ * Discord: rajadortv
+ * 
+ * 
+**/ 
+
+namespace betterauth\provider\types\file\task;
+
+use betterauth\provider\Account;
+
+/**
+ * This will return the accont instance
+ */
+class GetAccountFileAsyncTask extends FileAccountProcessAsyncTask
+{
+
+    protected function processAccountAndResult(Account $account, array $safeVarValues)
+    {
+        return $account;
+    }
+
+}

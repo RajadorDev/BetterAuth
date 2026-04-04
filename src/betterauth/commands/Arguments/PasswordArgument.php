@@ -1,7 +1,7 @@
 <?php
 
-declare (strict_types=1);
- 
+declare(strict_types=1);
+
 /***
  * 
  * ██████╗ ███████╗████████╗████████╗███████╗██████╗      █████╗ ██╗   ██╗████████╗██╗  ██╗
@@ -19,51 +19,33 @@ declare (strict_types=1);
  * 
  * NATANBX0: https://github.com/NATANBX0
  * 
-**/
+ **/
 
-namespace betterauth\session;
+namespace Betterauth\Commands\Arguments;
 
-use pocketmine\Player;
-use SmartCommand\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
+use SmartCommand\command\argument\BaseArgument;
+use SmartCommand\message\CommandMessages;
 
-final class SessionController 
+class PasswordArgument extends BaseArgument
 {
-
-    use SingletonTrait;
-
-    /** @var array<string,Session> */
-    protected $sessionsByName = [];
-
-    /** @var array<int,Session> */
-    protected $sessionsPerLoaderId = [];
-
-    /**
-     * @param Player $player
-     * @return boolean
-     */
-    public function isLoggedIn(Player $player) : bool
+    public function __construct(string $name, bool $required)
     {
-        
+        return parent::__construct(
+            $name,
+            'string',
+            $required,
+            function (&$given) {
+                if (strlen($given) < 8) {
+                    return false;
+                }
+            }
+        );
     }
 
-    /**
-     * TODO
-     * @param Player $player
-     * @return Session|null
-     */
-    public function getPlayerSession(Player $player)
+    public function getWrongMessage(CommandMessages $commandMessages, string $argumentUsed): string
     {
-        return $this->sessionsPerLoaderId[$player->getLoaderId()] ?? null;
+        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::GRAY . 'Sua senha precisa ter no mínimo ' . TextFormat::RED . ' 8 ' . TextFormat::GRAY . 'caracteres!');
+        return parent::getWrongMessage($commandMessages, $argumentUsed);
     }
-
-    /**
-     * @param string $username
-     * @return Session|null
-     */
-    public function getSessionByUsername(string $username)
-    {
-        return $this->sessionsByName[strtolower($username)] ?? null;
-    }
-
-
 }
