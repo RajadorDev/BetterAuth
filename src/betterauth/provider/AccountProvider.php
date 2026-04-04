@@ -49,4 +49,11 @@ interface AccountProvider
      * @return Promise<AuthException|true>
      */
     public function tryRegister(Player $player, string $password) : Promise;
+
+    /**
+     * @param string $username
+     * @return Promise<Account|null>
+     */
+    public function getAccount() : Promise;
+    
 }
