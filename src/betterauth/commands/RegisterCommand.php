@@ -21,11 +21,13 @@ declare(strict_types=1);
  * 
  **/
 
-namespace Betterauth\Commands;
+namespace betterauth\commands;
 
 use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
 use betterauth\Loader;
+use betterauth\provider\Account;
+use betterauth\session\SessionController;
 use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
@@ -55,18 +57,24 @@ class RegisterCommand extends SmartCommand
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
-        $passwrod = $args->getValue('password');
-        if ($args->has('password-confirm')) {
-            $passwrodConfirm = $args->getValue('password-confirm');
-            if ($passwrod === $passwrodConfirm) {
-                //TODO: adicionar funcao para registrar
-                $sender->sendMessage(Loader::getInstance()->getMessages()->get('registered-successfully'));
-                return;
-            }
-            $sender->sendMessage(Loader::getInstance()->getMessages()->get('passwords-dont-match'));
+        if (!is_null(SessionController::getInstance()->getPlayerSession($sender))) {
             return;
         }
-        $sender->sendMessage(Loader::getInstance()->getMessages()->get('password-confirm-required'));
+        $passwrod = $args->getValue('password');
+        if($args->has('password-confirm')) {
+            $passwrodConfirm = $args->getValue('password-confirm');
+            if ($passwrod !== $passwrodConfirm) {
+                $sender->sendMessage(Loader::getInstance()->getMessages()->get('passwords-dont-match'));
+                return;
+            }
+        }
+        Account::create(
+            strtolower($sender->getName()),
+            $passwrod,
+            $sender->getAddress(),
+            $sender->getClientId()
+        );
+        $sender->sendMessage(Loader::getInstance()->getMessages()->get('registered-successfully'));
         return;
     }
 }

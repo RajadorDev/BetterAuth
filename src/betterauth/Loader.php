@@ -1,7 +1,7 @@
 <?php
 
-declare (strict_types=1);
- 
+declare(strict_types=1);
+
 /***
  * 
  * ██████╗ ███████╗████████╗████████╗███████╗██████╗      █████╗ ██╗   ██╗████████╗██╗  ██╗
@@ -19,10 +19,11 @@ declare (strict_types=1);
  * 
  * NATANBX0: https://github.com/NATANBX0
  * 
-**/
+ **/
 
 namespace betterauth;
 
+use betterauth\commands\LogoutCommand;
 use betterauth\utils\Settings;
 use Betterauth\Commands\LoginCommand;
 use Betterauth\Commands\RegisterCommand;
@@ -33,11 +34,12 @@ use pocketmine\Server;
 use SmartCommand\utils\SingletonTrait;
 use betterauth\utils\SystemMessages;
 use betterauth\provider\types\file\FileAccountProvider;
+use betterauth\commands\ChangePasswordCommand;
 use SmartCommand\command\SmartCommand;
 
 class Loader extends PluginBase
 {
- 
+
     use SingletonTrait;
 
     /** @var SystemMessages */
@@ -48,7 +50,7 @@ class Loader extends PluginBase
 
     /** @var AccountProvider */
     protected $provider;
- 
+
     public function onLoad()
     {
         self::setInstance($this);
@@ -56,13 +58,12 @@ class Loader extends PluginBase
 
     public function onEnable()
     {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
+        if (!file_exists($dir = $this->getDataFolder())) {
             mkdir($dir);
         }
 
         $this->saveResource('config.yml');
-        
+
         $this->saveResource('messages.yml');
         $messagesFilePath = $dir . 'messages.yml';
 
@@ -81,17 +82,17 @@ class Loader extends PluginBase
         $this->provider = $provider;
     }
 
-    public function getMessages() : SystemMessages
+    public function getMessages(): SystemMessages
     {
         return $this->messages;
     }
 
-    public function getSettings() : Settings
+    public function getSettings(): Settings
     {
         return $this->settings;
     }
 
-    public function getProvider() : AccountProvider
+    public function getProvider(): AccountProvider
     {
         return $this->provider;
     }
@@ -101,13 +102,16 @@ class Loader extends PluginBase
         Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
     }
 
-    public function registerCommands() {
+    public function registerCommands()
+    {
         $cm = $this->getServer()->getCommandMap();
         $cm->register('register', new RegisterCommand());
         $cm->register('login', new LoginCommand());
+        $cm->register('changepassword', new ChangePasswordCommand);
+        $cm->register('logout', new LogoutCommand());
     }
 
-    public function pushMessagesToCommand(SmartCommand $command) 
+    public function pushMessagesToCommand(SmartCommand $command)
     {
         $command->getMessages()->add($this->messages->getFile()->getAll());
     }

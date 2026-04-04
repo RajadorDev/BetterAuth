@@ -7,4 +7,5 @@ player-auto-loged-in: "Voce foi logado automaticamente por IP"
 login-sucessfully: "Voce foi logado com sucesso"
 change-password: "voce trocou a sua senha nova senha: "
 generic-error: "Ocorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
+logout: 'Voce deslogou com sucesso'
 ...

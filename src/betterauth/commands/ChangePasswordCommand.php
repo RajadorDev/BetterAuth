@@ -21,7 +21,7 @@ declare(strict_types=1);
  * 
  **/
 
-namespace Betterauth\Commands;
+namespace betterauth\commands;
 
 use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
@@ -33,7 +33,7 @@ use SmartCommand\command\SmartCommand;
 use SmartCommand\message\CommandMessages;
 use SmartCommand\utils\MemberPermissionTrait;
 
-class LoginCommand extends SmartCommand
+class ChangePasswordCommand extends SmartCommand
 {
     public function __construct()
     {
