@@ -1,0 +1,10 @@
+---
+name: BetterAuth
+description: Sistema de login avançado para PocketMine 2.0.0 (0.14/15)
+author: Rajador, Bietio, NATANBXO
+discord: rajadortv
+api: 2.0.0
+depend: [SmartCommand]
+version: 1.0.0
+main: 'betterauth\Loader'
+...
