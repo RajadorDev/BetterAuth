@@ -35,7 +35,7 @@ class Settings
 
     const CONFIRM_REGISTER_PASSWORD = 'password.register-confirmation';
 
-    const MESSAGE_EVENTS_COOLDOWN = 'block-alert-coodown';
+    const MESSAGE_EVENTS_COOLDOWN = 'block-alert-cooldown';
 
     /** @var Config */
     protected $file;

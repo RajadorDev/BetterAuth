@@ -2,19 +2,32 @@
 
 namespace betterauth\listener;
 
+use betterauth\Loader;
 use betterauth\session\SessionController;
+use betterauth\utils\Settings;
+use betterauth\utils\SystemMessages;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 
-class AuthListener implements Listener
+final class AuthListener implements Listener
 {
 
     /** @var SessionController */
     private $session;
 
-    public function __construct()
+    /** @var SystemMessages */
+    private $message;
+
+    /** @var Settings */
+    private $settings;
+
+    public function __construct(SessionController $session)
     {
-        $this->session = new SessionController();
+        $this->session = $session;
+        $this->message = Loader::getInstance()->getMessages();
+        $this->settings = Loader::getInstance()->getSettings();
     }
 
     public function onMove(PlayerMoveEvent $event) 
@@ -23,7 +36,43 @@ class AuthListener implements Listener
 
         if (!$this->session->isLoggedIn($player)) 
         {
-            $player->sendMessage("Need logar para walk");
+            $this->message->sendCooldownMessage($player, "interation-not-logged", $this->settings->getBlockEventsMessageCooldown());
+
+            $event->setCancelled(true);
+        }
+    }
+
+    public function onInteract(PlayerInteractEvent $event) 
+    {
+        $player = $event->getPlayer();
+
+        if (!$this->session->isLoggedIn($player)) 
+        {
+            $this->message->sendCooldownMessage($player, "interation-not-logged", $this->settings->getBlockEventsMessageCooldown());
+
+            $event->setCancelled(true);
+        }
+    }
+
+    public function onBreak(BlockPlaceEvent $event)
+    {
+        $player = $event->getPlayer();
+
+        if (!$this->session->isLoggedIn($player)) 
+        {
+            $this->message->sendCooldownMessage($player, "interation-not-logged", $this->settings->getBlockEventsMessageCooldown());
+
+            $event->setCancelled(true);
+        }
+    }
+
+    public function onPlace(BlockPlaceEvent $event)
+    {
+        $player = $event->getPlayer();
+
+        if (!$this->session->isLoggedIn($player)) 
+        {
+            $this->message->sendCooldownMessage($player, "interation-not-logged", $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
         }
