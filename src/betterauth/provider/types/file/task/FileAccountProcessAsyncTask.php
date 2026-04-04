@@ -21,67 +21,51 @@ declare (strict_types=1);
  * 
 **/
 
-namespace betterauth;
+namespace betterauth\provider\types\file\task;
 
-use betterauth\utils\Settings;
-use Betterauth\Commands\LoginCommand;
-use Betterauth\Commands\RegisterCommand;
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use betterauth\provider\Account;
+use betterauth\provider\exception\AccountNotFoundException;
+use betterauth\utils\async\AsyncPromiseTask;
 
-class Loader extends PluginBase
+abstract class FileAccountProcessAsyncTask extends AsyncPromiseTask
 {
- 
-    use SingletonTrait;
 
-    /** @var SystemMessages */
-    protected $messages;
-
-    /** @var Settings */
-    protected $settings;
- 
-    public function onLoad()
+    public function __construct(array $data, string $path)
     {
-        self::setInstance($this);
+        $data['file_path'] = $path;
+        return parent::__construct($data, true);
     }
 
-    public function onEnable()
+    /**
+     * @param array{file_path:string} $safeVarValues
+     * @return mixed
+     */
+    protected function processAndResult(array $safeVarValues)
     {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
+        $filePath = $safeVarValues['file_path'];
+
+        if (!file_exists($filePath)) {
+            return new AccountNotFoundException("Account $filePath does not exists");
         }
 
-        $this->saveResource('config.yml');
-        
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
+        $fileData = file_get_contents($filePath);
 
-        $this->messages = SystemMessages::create($messagesFilePath);
-        $this->settings = new Settings($this->getConfig());
+        $jsonData = json_decode($fileData, true);
+
+        return $this->processAccountAndResult(
+            Account::unserialize(
+                $jsonData
+            ),
+            $safeVarValues
+        );
+
     }
 
-    public function getMessages() : SystemMessages
-    {
-        return $this->messages;
-    }
-
-    public function getSettings() : Settings
-    {
-        return $this->settings;
-    }
-
-    public function registerListener(Listener $listener)
-    {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
-    }
-
-    public function registerCommands() {
-        $cm = $this->getServer()->getCommandMap();
-        $cm->register('register', new RegisterCommand());
-        $cm->register('login', new LoginCommand());
-    }
+    /**
+     * It must to return the value of the promise
+     * @param Account $account
+     * @param array $safeVarValues
+     * @return mixed
+     */
+    abstract protected function processAccountAndResult(Account $account, array $safeVarValues);
 }

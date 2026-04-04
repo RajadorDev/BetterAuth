@@ -21,67 +21,43 @@ declare (strict_types=1);
  * 
 **/
 
-namespace betterauth;
+namespace betterauth\provider\types\file;
 
-use betterauth\utils\Settings;
-use Betterauth\Commands\LoginCommand;
-use Betterauth\Commands\RegisterCommand;
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use betterauth\provider\AccountProvider;
+use betterauth\utils\promise\Promise;
+use betterauth\utils\promise\PromiseResolver;
 
-class Loader extends PluginBase
+class FileAccountProvider implements AccountProvider
 {
- 
-    use SingletonTrait;
 
-    /** @var SystemMessages */
-    protected $messages;
+    /** @var string */
+    protected $accountsDir;
 
-    /** @var Settings */
-    protected $settings;
- 
-    public function onLoad()
+    /**
+     * @param string $dir
+     */
+    public function __construct(
+        string $dir
+    )
     {
-        self::setInstance($this);
+        $this->accountsDir = $dir;
     }
 
-    public function onEnable()
+    public function getPlayerFilePath(string $username) : string 
     {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
-        }
-
-        $this->saveResource('config.yml');
-        
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
-
-        $this->messages = SystemMessages::create($messagesFilePath);
-        $this->settings = new Settings($this->getConfig());
+        return $this->accountsDir . strtolower($username) . '.json';
     }
 
-    public function getMessages() : SystemMessages
+    public function isRegistered(string $username): Promise
     {
-        return $this->messages;
+        $promiseResolver = new PromiseResolver;
+        $promiseResolver->resolve(
+            file_exists($this->getPlayerFilePath($username))
+        );
+        return $promiseResolver->getPromise();
     }
 
-    public function getSettings() : Settings
-    {
-        return $this->settings;
-    }
 
-    public function registerListener(Listener $listener)
-    {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
-    }
 
-    public function registerCommands() {
-        $cm = $this->getServer()->getCommandMap();
-        $cm->register('register', new RegisterCommand());
-        $cm->register('login', new LoginCommand());
-    }
+
 }

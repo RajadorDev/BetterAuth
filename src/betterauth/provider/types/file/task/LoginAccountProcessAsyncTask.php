@@ -19,69 +19,24 @@ declare (strict_types=1);
  * 
  * NATANBX0: https://github.com/NATANBX0
  * 
-**/
+**/ 
 
-namespace betterauth;
+namespace betterauth\provider\types\file\task;
 
-use betterauth\utils\Settings;
-use Betterauth\Commands\LoginCommand;
-use Betterauth\Commands\RegisterCommand;
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use betterauth\provider\Account;
 
-class Loader extends PluginBase
+class LoginAccountProcessAsyncTask extends FileAccountProcessAsyncTask
 {
- 
-    use SingletonTrait;
 
-    /** @var SystemMessages */
-    protected $messages;
-
-    /** @var Settings */
-    protected $settings;
- 
-    public function onLoad()
+    public function __construct(string $path, string $password)
     {
-        self::setInstance($this);
+        return parent::__construct([
+            'password' => $password
+        ], $path);
     }
 
-    public function onEnable()
+    protected function processAccountAndResult(Account $account, array $safeVarValues)
     {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
-        }
-
-        $this->saveResource('config.yml');
-        
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
-
-        $this->messages = SystemMessages::create($messagesFilePath);
-        $this->settings = new Settings($this->getConfig());
-    }
-
-    public function getMessages() : SystemMessages
-    {
-        return $this->messages;
-    }
-
-    public function getSettings() : Settings
-    {
-        return $this->settings;
-    }
-
-    public function registerListener(Listener $listener)
-    {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
-    }
-
-    public function registerCommands() {
-        $cm = $this->getServer()->getCommandMap();
-        $cm->register('register', new RegisterCommand());
-        $cm->register('login', new LoginCommand());
+        return $account->matchPassword($safeVarValues['password']);
     }
 }
