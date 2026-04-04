@@ -5,6 +5,10 @@
 # Created by: Rajador, Bietio, NATANBX0
 #
 
+
+# Prefixo das mensagens enviada aos jogadores
+prefix: '§a§lBETTER§bAUTH  §r§7'
+
 password:
   # Seta se o jogador precisará confirmar a senha ou não
   register-confirmation: false
@@ -17,4 +21,24 @@ password:
 # Cooldown da mensagem enviada quando o jogador é bloquado 
 # de fazer uma ação por não estar logado (em segundos)
 block-alert-cooldown: 10
+
+# Ativar auto login por endereço IP (Recomendado)
+auto-login: true
+
+# Sala de espera do login
+logged-out-room:
+  # Define se ativa ou desativa a sala de deslogados (onde jogadores deslogados ficam)
+  enabled: true
+  # Mapa em que jogadores deslogados ficaram
+  world: 'LoggedOutRoom'
+  # Mapa que os jogadores serão teleportados ao logarem com sucesso (null = mapa padrão do servidor)
+  target-login-world: null
+  # Permitir jogadores de se mover no mapa de espera?
+  allow-move: true
+
+
+# Auto atualizar o plugin usando a API do GitHub?
+auto-update: true
+
+
 ...
