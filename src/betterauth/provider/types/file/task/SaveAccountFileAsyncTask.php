@@ -1,0 +1,32 @@
+<?php
+
+declare (strict_types=1);
+ 
+/***
+ *   
+ * Rajador Developer
+ * 
+ * ▒█▀▀█ ░█▀▀█ ░░░▒█ ░█▀▀█ ▒█▀▀▄ ▒█▀▀▀█ ▒█▀▀█ 
+ * ▒█▄▄▀ ▒█▄▄█ ░▄░▒█ ▒█▄▄█ ▒█░▒█ ▒█░░▒█ ▒█▄▄▀ 
+ * ▒█░▒█ ▒█░▒█ ▒█▄▄█ ▒█░▒█ ▒█▄▄▀ ▒█▄▄▄█ ▒█░▒█
+ * 
+ * GitHub: https://github.com/rajadordev
+ * 
+ * Discord: rajadortv
+ * 
+ * 
+**/ 
+
+namespace betterauth\provider\types\file\task;
+
+use betterauth\provider\Account;
+
+class SaveAccountFileAsyncTask extends FileAccountProcessAsyncTask
+{
+
+    protected function processAccountAndResult(Account $account, array $safeVarValues)
+    {
+        $account->save($safeVarValues['file_path']);
+    }
+    
+}
