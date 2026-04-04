@@ -21,65 +21,32 @@ declare (strict_types=1);
  * 
 **/
 
-namespace betterauth;
+namespace betterauth\provider;
 
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use betterauth\utils\promise\Promise;
+use pocketmine\Player;
+use betterauth\provider\exception\AuthException;
 
-class Loader extends PluginBase
+interface AccountProvider
 {
- 
-    use SingletonTrait;
-
-    /** @var SystemMessages */
-    protected $messages;
- 
-    public function onLoad()
-    {
-        self::setInstance($this);
-    }
-
-    public function onEnable()
-    {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
-        }
-
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
-
-        $this->messages = SystemMessages::create($messagesFilePath);
-    }
-
-    public function getMessages() : SystemMessages
-    {
-        return $this->messages;
-    }
 
     /**
-     * @param string $identifier
-     * @param mixed $defaultValue
-     * @param boolean $warnConsole
-     * @return mixed
+     * @param Player $player
+     * @param string $password
+     * @return Promise<AuthException|true>
      */
-    public function getConfigValue(string $identifier, $defaultValue = null, bool $warnConsole = true)
-    {
-        $settings = $this->getConfig();
-        if ($settings->exists($identifier)) {
-            return $settings->get($identifier);
-        } else if ($warnConsole) {
-            $this->getLogger()->warning("Setting with id $identifier does not found!");
-        }
-        return $defaultValue;
-    }
+    public function tryLogin(Player $player, string $password) : Promise;
 
-    public function registerListener(Listener $listener)
-    {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
-    }
+    /**
+     * @param string $username
+     * @return Promise<boolean>
+     */
+    public function isRegistered(string $username) : Promise;
 
+    /**
+     * @param Player $player
+     * @param string $password
+     * @return Promise<AuthException|true>
+     */
+    public function tryRegister(Player $player, string $password) : Promise;
 }

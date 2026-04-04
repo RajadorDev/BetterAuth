@@ -21,65 +21,51 @@ declare (strict_types=1);
  * 
 **/
 
-namespace betterauth;
+namespace betterauth\provider\types\file\task;
 
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use betterauth\provider\Account;
+use betterauth\provider\exception\AccountNotFoundException;
+use betterauth\utils\async\AsyncPromiseTask;
 
-class Loader extends PluginBase
+abstract class FileAccountProcessAsyncTask extends AsyncPromiseTask
 {
- 
-    use SingletonTrait;
 
-    /** @var SystemMessages */
-    protected $messages;
- 
-    public function onLoad()
+    public function __construct(array $data, string $path)
     {
-        self::setInstance($this);
-    }
-
-    public function onEnable()
-    {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
-        }
-
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
-
-        $this->messages = SystemMessages::create($messagesFilePath);
-    }
-
-    public function getMessages() : SystemMessages
-    {
-        return $this->messages;
+        $data['file_path'] = $path;
+        return parent::__construct($data, true);
     }
 
     /**
-     * @param string $identifier
-     * @param mixed $defaultValue
-     * @param boolean $warnConsole
+     * @param array{file_path:string} $safeVarValues
      * @return mixed
      */
-    public function getConfigValue(string $identifier, $defaultValue = null, bool $warnConsole = true)
+    protected function processAndResult(array $safeVarValues)
     {
-        $settings = $this->getConfig();
-        if ($settings->exists($identifier)) {
-            return $settings->get($identifier);
-        } else if ($warnConsole) {
-            $this->getLogger()->warning("Setting with id $identifier does not found!");
+        $filePath = $safeVarValues['file_path'];
+
+        if (!file_exists($filePath)) {
+            return new AccountNotFoundException("Account $filePath does not exists");
         }
-        return $defaultValue;
+
+        $fileData = file_get_contents($filePath);
+
+        $jsonData = json_decode($fileData, true);
+
+        return $this->processAccountAndResult(
+            Account::unserialize(
+                $jsonData
+            ),
+            $safeVarValues
+        );
+
     }
 
-    public function registerListener(Listener $listener)
-    {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
-    }
-
+    /**
+     * It must to return the value of the promise
+     * @param Account $account
+     * @param array $safeVarValues
+     * @return mixed
+     */
+    abstract protected function processAccountAndResult(Account $account, array $safeVarValues);
 }

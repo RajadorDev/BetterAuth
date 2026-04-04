@@ -21,65 +21,8 @@ declare (strict_types=1);
  * 
 **/
 
-namespace betterauth;
+namespace betterauth\provider\exception;
 
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use Exception;
 
-class Loader extends PluginBase
-{
- 
-    use SingletonTrait;
-
-    /** @var SystemMessages */
-    protected $messages;
- 
-    public function onLoad()
-    {
-        self::setInstance($this);
-    }
-
-    public function onEnable()
-    {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
-        }
-
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
-
-        $this->messages = SystemMessages::create($messagesFilePath);
-    }
-
-    public function getMessages() : SystemMessages
-    {
-        return $this->messages;
-    }
-
-    /**
-     * @param string $identifier
-     * @param mixed $defaultValue
-     * @param boolean $warnConsole
-     * @return mixed
-     */
-    public function getConfigValue(string $identifier, $defaultValue = null, bool $warnConsole = true)
-    {
-        $settings = $this->getConfig();
-        if ($settings->exists($identifier)) {
-            return $settings->get($identifier);
-        } else if ($warnConsole) {
-            $this->getLogger()->warning("Setting with id $identifier does not found!");
-        }
-        return $defaultValue;
-    }
-
-    public function registerListener(Listener $listener)
-    {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
-    }
-
-}
+class AuthException extends Exception {}

@@ -21,65 +21,43 @@ declare (strict_types=1);
  * 
 **/
 
-namespace betterauth;
+namespace betterauth\provider\types\file;
 
-use pocketmine\event\Listener;
-use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
-use SmartCommand\utils\SingletonTrait;
-use betterauth\utils\SystemMessages;
+use betterauth\provider\AccountProvider;
+use betterauth\utils\promise\Promise;
+use betterauth\utils\promise\PromiseResolver;
 
-class Loader extends PluginBase
+class FileAccountProvider implements AccountProvider
 {
- 
-    use SingletonTrait;
 
-    /** @var SystemMessages */
-    protected $messages;
- 
-    public function onLoad()
-    {
-        self::setInstance($this);
-    }
-
-    public function onEnable()
-    {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
-            mkdir($dir);
-        }
-
-        $this->saveResource('messages.yml');
-        $messagesFilePath = $dir . 'messages.yml';
-
-        $this->messages = SystemMessages::create($messagesFilePath);
-    }
-
-    public function getMessages() : SystemMessages
-    {
-        return $this->messages;
-    }
+    /** @var string */
+    protected $accountsDir;
 
     /**
-     * @param string $identifier
-     * @param mixed $defaultValue
-     * @param boolean $warnConsole
-     * @return mixed
+     * @param string $dir
      */
-    public function getConfigValue(string $identifier, $defaultValue = null, bool $warnConsole = true)
+    public function __construct(
+        string $dir
+    )
     {
-        $settings = $this->getConfig();
-        if ($settings->exists($identifier)) {
-            return $settings->get($identifier);
-        } else if ($warnConsole) {
-            $this->getLogger()->warning("Setting with id $identifier does not found!");
-        }
-        return $defaultValue;
+        $this->accountsDir = $dir;
     }
 
-    public function registerListener(Listener $listener)
+    public function getPlayerFilePath(string $username) : string 
     {
-        Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
+        return $this->accountsDir . strtolower($username) . '.json';
     }
+
+    public function isRegistered(string $username): Promise
+    {
+        $promiseResolver = new PromiseResolver;
+        $promiseResolver->resolve(
+            file_exists($this->getPlayerFilePath($username))
+        );
+        return $promiseResolver->getPromise();
+    }
+
+
+
 
 }
