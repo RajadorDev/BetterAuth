@@ -29,21 +29,23 @@ use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
+use SmartCommand\message\CommandMessages;
 use SmartCommand\utils\MemberPermissionTrait;
 
-class RegisterCommand extends SmartCommand
+class LoginCommand extends SmartCommand
 {
-    use MemberPermissionTrait;
     public function __construct()
     {
         return parent::__construct(
-            'register',
-            'register in ther server',
-            '/register <password>',
-            ['registrar'],
+            'login',
+            'Log-in the server',
+            '/login <password>',
+            ['logar'],
             $messages = null
         );
     }
+
+    use MemberPermissionTrait;
 
     protected function prepare()
     {

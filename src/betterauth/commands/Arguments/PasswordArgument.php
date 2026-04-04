@@ -21,38 +21,31 @@ declare(strict_types=1);
  * 
  **/
 
-namespace Betterauth\Commands;
+namespace Betterauth\Commands\Arguments;
 
-use betterauth\command\rule\NotLoggedInCommandRule;
-use Betterauth\Commands\Arguments\PasswordArgument;
-use pocketmine\command\CommandSender;
-use SmartCommand\command\CommandArguments;
-use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
-use SmartCommand\command\SmartCommand;
-use SmartCommand\utils\MemberPermissionTrait;
+use pocketmine\utils\TextFormat;
+use SmartCommand\command\argument\BaseArgument;
+use SmartCommand\message\CommandMessages;
 
-class RegisterCommand extends SmartCommand
+class PasswordArgument extends BaseArgument
 {
-    use MemberPermissionTrait;
-    public function __construct()
+    public function __construct(string $name, bool $required)
     {
         return parent::__construct(
-            'register',
-            'register in ther server',
-            '/register <password>',
-            ['registrar'],
-            $messages = null
+            $name,
+            'string',
+            $required,
+            function (&$given) {
+                if (strlen($given) < 8) {
+                    return false;
+                }
+            }
         );
     }
 
-    protected function prepare()
+    public function getWrongMessage(CommandMessages $commandMessages, string $argumentUsed): string
     {
-        $this->registerArgument(0, new PasswordArgument('password', true));
-        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
-    }
-
-    protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
-    {
-
+        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::GRAY . 'Sua senha precisa ter no mínimo ' . TextFormat::RED . ' 8 ' . TextFormat::GRAY . 'caracteres!');
+        return parent::getWrongMessage($commandMessages, $argumentUsed);
     }
 }

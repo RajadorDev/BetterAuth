@@ -1,11 +1,12 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
 
 namespace betterauth\command\rule;
 
 use betterauth\session\SessionController;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use SmartCommand\command\rule\CommandSenderRule;
 
 class NotLoggedInCommandRule implements CommandSenderRule
@@ -29,6 +30,5 @@ class NotLoggedInCommandRule implements CommandSenderRule
         //TODO: Adicionar a mensagem pelo comando pegando de uma config
         return $command->getMessages()->get('not-logged-in');
     }
-
 
 }
