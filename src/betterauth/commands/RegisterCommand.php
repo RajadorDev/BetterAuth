@@ -25,6 +25,7 @@ namespace betterauth\commands;
 
 use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
+use betterauth\event\PlayerRegisterEvent;
 use betterauth\Loader;
 use betterauth\provider\Account;
 use betterauth\provider\exception\AccountAlreadyRegisteredException;
@@ -85,7 +86,14 @@ class RegisterCommand extends SmartCommand
                         if ($result instanceof Exception) {
                             throw $result;
                         }
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-registered', '{password}', $password));
+                        SystemUtils::callEvent(new PlayerRegisterEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
+                        $settings = Loader::getInstance()->getSettings();
+                        $passwordToShow = $password;
+                        if ($settings->isHidePasswordEnabled()) {
+                            $percent = $settings->getShowPasswordPercent();
+                            $passwordToShow = SystemUtils::hideChars($password, $percent);
+                        }
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-registered', '{password}', $passwordToShow));
                     } catch (AccountAlreadyRegisteredException $error) {
                         $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-alredy-registered'));
                     }

@@ -25,9 +25,11 @@ namespace betterauth\commands;
 
 use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
+use betterauth\event\PlayerChangePasswordEvent;
 use betterauth\Loader;
 use betterauth\provider\exception\AccountNotFoundException;
 use betterauth\provider\exception\WrongPasswordException;
+use betterauth\session\SessionController;
 use betterauth\utils\SystemUtils;
 use Exception;
 use pocketmine\command\CommandSender;
@@ -62,6 +64,7 @@ class ChangePasswordCommand extends SmartCommand
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
+        SystemUtils::callEvent(new PlayerChangePasswordEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
         $password = $args->getValue('password');
         $passwordConfirm = $args->getValue('password-confirm');
         $name = $sender->getName();
@@ -70,7 +73,7 @@ class ChangePasswordCommand extends SmartCommand
             $password,
             $passwordConfirm
         )->then(
-                function ($result) use ($passwordConfirm, $sender) {
+                function ($result) use ($password, $sender) {
                     if (!SystemUtils::isValidPlayer($sender)) {
                         return;
                     }
@@ -78,8 +81,13 @@ class ChangePasswordCommand extends SmartCommand
                         if ($result instanceof Exception) {
                             throw $result;
                         }
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('change-password-successfully', '{password}', $passwordConfirm));
-
+                        $settings = Loader::getInstance()->getSettings();
+                        $passwordToShow = $password;
+                        if ($settings->isHidePasswordEnabled()) {
+                            $percent = $settings->getShowPasswordPercent();
+                            $passwordToShow = SystemUtils::hideChars($password, $percent);
+                        }
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('change-password-successfully', '{password}', $passwordToShow));
                     } catch (WrongPasswordException $error) {
                         $sender->sendMessage(Loader::getInstance()->getMessages()->get('wrong-password-confirm'));
                     } catch (AccountNotFoundException $error) {

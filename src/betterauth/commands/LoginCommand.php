@@ -64,7 +64,7 @@ class LoginCommand extends SmartCommand
     {
         $password = $args->getValue('password');
         Loader::getInstance()->getProvider()->tryLogin($sender, $password)->then(
-            function ($result) use ($sender) {
+            function ($result) use ($sender, $password) {
                 if (!SystemUtils::isValidPlayer($sender)) {
                     return;
                 }
@@ -73,13 +73,11 @@ class LoginCommand extends SmartCommand
                     if ($result instanceof Exception) {
                         throw $result;
                     }
-
                     try {
                         SessionController::getInstance()->acceptLogin($sender, $result, false);
                     } catch (SessionAlreadyLoggedInException $error) {
                         $sender->close('', 'Já tem alguém logado com seu nome');
                     }
-
                 } catch (AccountNotFoundException $error) {
                     $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-fot-found'));
                 } catch (WrongPasswordException $error) {
