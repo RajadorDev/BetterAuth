@@ -102,12 +102,21 @@ final class AuthListener implements Listener
     {
         $player = $event->getPlayer();
 
+        $this->loader->onPlayerJoin($player);
+
+        if (!$this->settings->isAutoLoginEnabled()) 
+        {
+            return;
+        }
+
         Loader::getInstance()->getProvider()->getAccount($player->getName())
-            ->then(
-                function ($result) use ($player) {
-                    if ($result instanceof Account && $result->matchAutoLogin($player)) {
-                        try {
-                            SessionController::getInstance()->acceptLogin($player, $result, true);
+        ->then(
+            function ($result) use ($player) 
+            {
+                if ($result instanceof Account && $result->matchAutoLogin($player)) 
+                {
+                    try {
+                        $this->session->acceptLogin($player, $result, true);
 
                         } catch (SessionAlreadyLoggedInException $error) {
 
