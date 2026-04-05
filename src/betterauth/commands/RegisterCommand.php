@@ -55,9 +55,6 @@ class RegisterCommand extends SmartCommand
 
     protected function prepare()
     {
-        $maxChar = Loader::getInstance()->getSettings()->getMaxPasswordLength();
-        $minChar = Loader::getInstance()->getSettings()->getMinPasswordLength();
-        $this->getMessages()->set('password-length', Loader::getInstance()->getMessages()->get('password-length', ['{min_char}', '{max_char}'], [$minChar, $maxChar]));
         $this->registerArgument(0, new PasswordArgument('password', true));
         $this->registerArgument(1, new PasswordArgument('password-confirm', Loader::getInstance()->getSettings()->needToConfirmPassword()));
         $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
@@ -80,32 +77,32 @@ class RegisterCommand extends SmartCommand
             $sender,
             $password
         )->then(
-            function ($result) use ($password, $sender) {
-                if (!SystemUtils::isValidPlayer($sender)) {
-                    return;
-                }
-                try {
-                    if ($result instanceof Exception) {
-                        throw $result;
+                function ($result) use ($password, $sender) {
+                    if (!SystemUtils::isValidPlayer($sender)) {
+                        return;
                     }
-                    SystemUtils::callEvent(new PlayerRegisterEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
-                    $settings = Loader::getInstance()->getSettings();
-                    $passwordToShow = $password;
-                    if ($settings->isHidePasswordEnabled()) {
-                        $percent = $settings->getShowPasswordPercent();
-                        $passwordToShow = SystemUtils::hideChars($password, $percent);
+                    try {
+                        if ($result instanceof Exception) {
+                            throw $result;
+                        }
+                        SystemUtils::callEvent(new PlayerRegisterEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
+                        $settings = Loader::getInstance()->getSettings();
+                        $passwordToShow = $password;
+                        if ($settings->isHidePasswordEnabled()) {
+                            $percent = $settings->getShowPasswordPercent();
+                            $passwordToShow = SystemUtils::hideChars($password, $percent);
+                        }
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-registered', '{password}', $passwordToShow));
+                    } catch (AccountAlreadyRegisteredException $error) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-alredy-registered'));
                     }
-                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-registered', '{password}', $passwordToShow));
-                } catch (AccountAlreadyRegisteredException $error) {
-                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-alredy-registered'));
                 }
-            }
-        )->then(
-            function () use ($sender) {
-                if (SystemUtils::isValidPlayer($sender)) {
-                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+            )->then(
+                function () use ($sender) {
+                    if (SystemUtils::isValidPlayer($sender)) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+                    }
                 }
-            }
-        );
+            );
     }
 }

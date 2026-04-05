@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace betterauth\commands\arguments;
 
 use betterauth\Loader;
-use pocketmine\utils\TextFormat;
 use SmartCommand\command\argument\BaseArgument;
 use SmartCommand\message\CommandMessages;
 
@@ -49,6 +48,15 @@ class PasswordArgument extends BaseArgument
 
     public function getWrongMessage(CommandMessages $commandMessages, string $argumentUsed): string
     {
-        return parent::getWrongMessage($commandMessages, $argumentUsed);
+        $maxChar = Loader::getInstance()->getSettings()->getMaxPasswordLength();
+        $minChar = Loader::getInstance()->getSettings()->getMinPasswordLength();
+        return $commandMessages->get('password-length', [
+            '{min_char}',
+            '{max_char}'
+        ], [
+            $minChar,
+            $maxChar
+        ]);
     }
+
 }
