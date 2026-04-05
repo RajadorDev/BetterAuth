@@ -104,11 +104,11 @@ final class SessionController
         return $session;
     }
 
-    public function logout(Session $session)
+    public function logout(Session $session, bool $disconnected)
     {
         unset($this->sessionsPerLoaderId[$session->getPlayer()->getLoaderId()]);
         unset($this->sessionsByName[strtolower($session->getPlayer()->getName())]);
-        SystemUtils::callEvent(new PlayerLoggedOutEvent($session->getPlayer(), $session));
+        SystemUtils::callEvent(new PlayerLoggedOutEvent($session->getPlayer(), $session, $disconnected));
     }
 
 

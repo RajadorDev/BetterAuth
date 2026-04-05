@@ -49,6 +49,12 @@ class Settings
 
     const AUTO_UPDATE = 'auto-update';
 
+    const HIDE_PASSWORD_PREFIX = 'hide-password.';
+
+    const HIDE_PASSWORD_ENABLED = self::HIDE_PASSWORD_PREFIX . 'enabled';
+
+    const SHOW_PASSWORD_PERCENT = self::HIDE_PASSWORD_PREFIX . 'chars-percent';
+
     /** @var Config */
     protected $file;
 
@@ -71,7 +77,7 @@ class Settings
      * @param boolean $warnConsoleWhenFail
      * @return mixed
      */
-    public function getValue(string $identifier, bool $nested = false, $default = null, bool $warnConsoleWhenFail = false)
+    public function getValue(string $identifier, bool $nested = false, $default = null, bool $warnConsoleWhenFail = true)
     {
         $result = $nested ? $this->file->getNested($identifier, null) : $this->file->get($identifier, null);
         if (is_null($result)) {
@@ -116,6 +122,22 @@ class Settings
     public function getBlockEventsMessageCooldown() : int 
     {
         return $this->getInteger(self::MESSAGE_EVENTS_COOLDOWN, 10, false);
+    }
+
+    public function isHidePasswordEnabled() : bool 
+    {
+        return $this->getBool(self::HIDE_PASSWORD_ENABLED, true, true);
+    }
+
+    public function getShowPasswordPercent() : int 
+    {
+        return intval(
+            $this->getValue(
+                self::SHOW_PASSWORD_PERCENT,
+                true,
+                20.0
+            )
+        );
     }
 
 }

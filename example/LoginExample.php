@@ -1,5 +1,7 @@
 <?php
 
+use betterauth\event\PlayerChangePasswordEvent;
+use betterauth\event\PlayerRegisterEvent;
 use betterauth\Loader;
 use betterauth\provider\Account;
 use betterauth\provider\exception\AccountNotFoundException;
@@ -95,3 +97,20 @@ Loader::getInstance()->getProvider()->changePassword(
         }
     }
 );
+
+
+SystemUtils::callEvent(new PlayerRegisterEvent($player, $account));
+
+
+SystemUtils::callEvent(new PlayerChangePasswordEvent($player, $account));
+
+$settings = Loader::getInstance()->getSettings();
+
+$senha = 'olá mundo';
+if ($settings->isHidePasswordEnabled()) {
+    $percent = $settings->getShowPasswordPercent();
+
+    $length = SystemUtils::getCharsPercentLength($senha, $percent);
+
+    $passwordToShow = SystemUtils::hideChars($senha, $length);
+}

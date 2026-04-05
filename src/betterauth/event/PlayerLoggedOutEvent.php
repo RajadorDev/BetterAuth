@@ -35,19 +35,29 @@ class PlayerLoggedOutEvent extends PlayerEvent
     /** @var Session */
     protected $session;
 
+    /** @var boolean */
+    protected $disconnected;
+
     /**
      * @param Player $player
      * @param Session $session
+     * @param boolean $disconnected
      */
-    public function __construct(Player $player, Session $session)
+    public function __construct(Player $player, Session $session, bool $disconnected)
     {
         $this->player = $player;
         $this->session = $session;
+        $this->disconnected = $disconnected;
     }
 
     public function getSession() : Session
     {
         return $this->session;
+    }
+
+    public function wasDisconnected() : bool 
+    {
+        return $this->disconnected;
     }
 
 }

@@ -19,9 +19,7 @@ declare (strict_types=1);
 
 namespace betterauth\event;
 
-use pocketmine\event\Cancellable;
-
-class PlayerChangePasswordEvent extends PlayerAccountEvent implements Cancellable
+class PlayerChangePasswordEvent extends PlayerAccountEvent
 {
 
     public static $handlerList = null;

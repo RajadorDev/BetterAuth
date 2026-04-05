@@ -195,6 +195,14 @@ class Loader extends PluginBase
         );
     }
 
+    public function allowNotLoggedInPlayerMove() : bool 
+    {
+        if ($this->loggedOutRoom) {
+            return $this->loggedOutRoom->canMove();
+        }
+        return false;
+    }
+
     protected function initListeners() 
     {
         foreach ([

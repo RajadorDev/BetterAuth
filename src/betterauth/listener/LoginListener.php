@@ -23,10 +23,14 @@ declare (strict_types=1);
 
 namespace betterauth\listener;
 
+use betterauth\event\PlayerChangePasswordEvent;
 use betterauth\event\PlayerLoggedOutEvent;
 use betterauth\event\PlayerLoginSucessfullyEvent;
+use betterauth\event\PlayerRegisterEvent;
+use betterauth\Loader;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
+use betterauth\utils\SystemUtils;
 use pocketmine\event\Listener;
 
 final class LoginListener implements Listener
@@ -58,5 +62,21 @@ final class LoginListener implements Listener
      * @priority LOWEST
      */
     public function onLogout(PlayerLoggedOutEvent $event)
+    {
+        if (!Loader::getInstance()->allowNotLoggedInPlayerMove()) {
+            SystemUtils::freezePlayer($event->getPlayer(), true);
+        }
+    }
+
+    /**
+     * @priority LOWEST
+     */
+    public function onChangePassword(PlayerChangePasswordEvent $event) 
+    {}
+
+    /**
+     * @priority LOWEST
+     */
+    public function onRegisterAccount(PlayerRegisterEvent $event)
     {}
 }
