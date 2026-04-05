@@ -23,6 +23,7 @@ final class AuthListener implements Listener
     /** @var Settings */
     private $settings;
 
+    
     public function __construct(SessionController $session)
     {
         $this->session = $session;
@@ -30,6 +31,10 @@ final class AuthListener implements Listener
         $this->settings = Loader::getInstance()->getSettings();
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onMove(PlayerMoveEvent $event) 
     {
         $player = $event->getPlayer();
@@ -42,6 +47,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onInteract(PlayerInteractEvent $event) 
     {
         $player = $event->getPlayer();
@@ -54,6 +63,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onBreak(BlockPlaceEvent $event)
     {
         $player = $event->getPlayer();
@@ -66,6 +79,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onPlace(BlockPlaceEvent $event)
     {
         $player = $event->getPlayer();
