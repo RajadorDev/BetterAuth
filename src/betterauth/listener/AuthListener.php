@@ -109,6 +109,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onDamage(EntityDamageEvent $event)
     {
         $entity = $event->getEntity();
@@ -131,6 +135,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onQuit(PlayerQuitEvent $event)
     {
         $player = $event->getPlayer();
