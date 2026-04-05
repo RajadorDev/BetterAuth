@@ -23,8 +23,6 @@ declare (strict_types=1);
 
 namespace betterauth;
 
-use betterauth\listener\AuthListener;
-use betterauth\session\SessionController;
 use betterauth\utils\Settings;
 use Betterauth\Commands\LoginCommand;
 use Betterauth\Commands\RegisterCommand;
@@ -39,6 +37,7 @@ use betterauth\utils\SystemMessages;
 use betterauth\provider\types\file\FileAccountProvider;
 use betterauth\room\LoggedOutRoom;
 use betterauth\session\SessionController;
+use pocketmine\command\Command;
 use pocketmine\plugin\Plugin;
 use rajadordev\autoupdater\api\CheckUpdateScheduler;
 use rajadordev\autoupdater\api\plugin\defaults\github\GitHubPluginUpdaterAPI;
@@ -61,6 +60,9 @@ class Loader extends PluginBase
 
     /** @var LoggedOutRoom|null */
     protected $loggedOutRoom = null;
+
+    /** @var array<string,SmartCommand> */
+    protected $allowedNotLoggedInCommands = [];
  
     public function onLoad()
     {
@@ -154,9 +156,32 @@ class Loader extends PluginBase
     }
 
     protected function registerCommands() {
-        $cm = $this->getServer()->getCommandMap();
-        $cm->register('register', new RegisterCommand());
-        $cm->register('login', new LoginCommand());
+        $commandMap = $this->getServer()->getCommandMap();
+        
+        foreach (
+            [
+                new LoginCommand,
+                new RegisterCommand
+            ] as $authCommand
+        ) {
+            $this->allowedNotLoggedInCommands[$authCommand->getName()] = $authCommand;
+            $commandMap->register('betterauth', $authCommand);
+        }
+    }
+
+    public function isAuthCommand(string $commandLine) : bool
+    {
+        $splitedCommand = explode(' ', $commandLine);
+
+        $commandName = array_shift($splitedCommand);
+
+        $commandFound = Server::getInstance()->getCommandMap()->getCommand($commandName);
+
+        return (
+            $commandFound instanceof Command
+            && 
+            isset($this->allowedNotLoggedInCommands[$commandFound->getName()])
+        );
     }
 
     protected function pushMessagesToCommand(SmartCommand $command) 
