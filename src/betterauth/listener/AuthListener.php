@@ -62,7 +62,7 @@ final class AuthListener implements Listener
     {
         $commandLine = $event->getMessage();
 
-        if (!$this->loader->isAuthCommand($commandLine)) {
+        if (isset($commandLine[0]) && $commandLine[0] === '/' && !SessionController::getInstance()->isLoggedIn($event->getPlayer()) && !$this->loader->isAuthCommand($commandLine)) {
             $this->message->send($event->getPlayer(), 'not-logged-in-command');
 
             $event->setCancelled(true);
