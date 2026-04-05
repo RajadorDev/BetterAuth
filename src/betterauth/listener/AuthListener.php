@@ -18,7 +18,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 
 use pocketmine\event\Listener;
-
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -37,12 +37,34 @@ final class AuthListener implements Listener
     /** @var Settings */
     private $settings;
 
+    /** @var Loader */
+    private $loader;
+
     
     public function __construct(SessionController $session)
     {
-        $this->session = $session;
-        $this->message = Loader::getInstance()->getMessages();
-        $this->settings = Loader::getInstance()->getSettings();
+        $this->session  = $session;
+
+        $this->loader   = Loader::getInstance();
+        $this->message  = $this->loader->getMessages();
+        $this->settings = $this->loader->getSettings();
+
+    }
+
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
+    public function onPreprocessCommand(PlayerCommandPreprocessEvent $event) 
+    {
+        $commandLine = $event->getMessage();
+
+        if (!$this->loader->isAuthCommand($commandLine)) 
+        {
+            $this->message->send($event->getPlayer(), "not-logged-in-command");
+
+            $event->setCancelled(true);
+        }
     }
 
     /**
@@ -59,6 +81,39 @@ final class AuthListener implements Listener
 
             $event->setCancelled(true);
         }
+    }
+
+    public function onPreLogin(PlayerPreLoginEvent $event)
+    {
+        $playerName = $event->getPlayer()->getName();
+
+        $event->setKickMessage($this->message->get("screen-cant-join", "{player_name}", $playerName));
+        if ($this->session->getSessionByUsername($playerName) !== null) 
+        {
+            $event->setCancelled(true);
+        }
+    }
+
+    public function onLogin(PlayerLoginEvent $event)
+    {
+        $player = $event->getPlayer();
+
+        Loader::getInstance()->getProvider()->getAccount($player->getName())
+        ->then(
+            function ($result) use ($player) 
+            {
+                if ($result instanceof Account && $result->matchPlayerAddress($player)) 
+                {
+                    try {
+                        SessionController::getInstance()->acceptLogin($player, $result, true);
+
+                    } catch (SessionAlreadyLoggedInException $error) {
+
+                        $player->close('', $this->message->get("already-logged"));
+                    }
+                }
+            }
+        );
     }
 
     /**
@@ -146,7 +201,7 @@ final class AuthListener implements Listener
         $session = $this->session->getSessionByUsername($player->getName());
         if ($session instanceof Session) 
         {
-            $session->destroy();
+            $session->destroy(true);
         }
     }
 }
