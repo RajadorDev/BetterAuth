@@ -93,7 +93,7 @@ class FileAccountProvider implements AccountProvider
             return $resolver->getPromise();
         }
 
-        $account = Account::create($username, $password, $player->getAddress(), $player->getClientSecret());
+        $account = Account::create($username, $password, $player->getAddress(), $player->getClientId());
         $task = new RegisterAccountProcessAsyncTask($this->getPlayerFilePath($username), $account);
         $task::schedule($task);
         return $task->getPromise();
