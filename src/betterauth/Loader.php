@@ -37,12 +37,14 @@ use betterauth\utils\SystemMessages;
 use betterauth\provider\types\file\FileAccountProvider;
 use betterauth\room\LoggedOutRoom;
 use betterauth\session\SessionController;
+use betterauth\session\task\LoginTimeoutTask;
 use pocketmine\command\Command;
 use pocketmine\plugin\Plugin;
 use rajadordev\autoupdater\api\CheckUpdateScheduler;
 use rajadordev\autoupdater\api\plugin\defaults\github\GitHubPluginUpdaterAPI;
 use rajadordev\autoupdater\api\PluginUpdaterChecker;
 use SmartCommand\command\SmartCommand;
+use SmartCommand\message\DefaultMessages;
 
 class Loader extends PluginBase
 {
@@ -98,6 +100,20 @@ class Loader extends PluginBase
         $this->registerCommands();
 
         $this->tryAutoUpdate();
+
+        $this->registerTimeoutTask();
+    }
+
+    protected function registerTimeoutTask()
+    {
+        $maxTime = $this->settings->getInteger(Settings::MAX_AUTH_TIMEOUT, 25, false);
+
+        if ($maxTime > 0) {
+            LoginTimeoutTask::init($maxTime * 20);
+            $this->getLogger()->info("Max auth time setted as $maxTime seconds");
+        } else {
+            $this->getLogger()->info("Auth timout is disabled! Players can keel online even if not login");
+        }
     }
 
     protected function tryAutoUpdate()
@@ -156,12 +172,19 @@ class Loader extends PluginBase
     }
 
     protected function registerCommands() {
+
+        $messages = DefaultMessages::PORTUGUESE();
+
+        $messages->add(
+            $this->messages->getFile()->getAll()
+        );
+
         $commandMap = $this->getServer()->getCommandMap();
         
         foreach (
             [
-                new LoginCommand,
-                new RegisterCommand
+                new LoginCommand($messages),
+                new RegisterCommand($messages)
             ] as $authCommand
         ) {
             $this->allowedNotLoggedInCommands[$authCommand->getName()] = $authCommand;
@@ -184,9 +207,12 @@ class Loader extends PluginBase
         );
     }
 
-    protected function pushMessagesToCommand(SmartCommand $command) 
+    public function allowNotLoggedInPlayerMove() : bool 
     {
-        $command->getMessages()->add($this->messages->getFile()->getAll());
+        if ($this->loggedOutRoom) {
+            return $this->loggedOutRoom->canMove();
+        }
+        return false;
     }
 
     protected function initListeners() 

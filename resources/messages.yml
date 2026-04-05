@@ -6,4 +6,6 @@ already-logged-in: '§cVocê já está logado!'
 interation-not-logged: "§7Você precisa logar para interagir ou se mover"
 screen-cant-join: "§fJá existe uma sessão com o username §e\"{player_name}\""
 not-logged-in-command: '§cVocê precisa logar para executar outros comandos!'
+login-timeout-screen: '§cVocê demorou muito para se autenticar!'
+screen-max-attempts: '§cVocê tentou logar muitas vezes'
 ...

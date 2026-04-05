@@ -23,62 +23,44 @@ declare (strict_types=1);
 
 namespace betterauth\session;
 
-use betterauth\provider\Account;
+use betterauth\Loader;
 use pocketmine\Player;
 
-class Session
+class LoginAttempts 
 {
 
-    /** @var Player */
-    protected $player;
+    /** @var array<string,int> */
+    protected static $maxLoginAttempts = [];
 
-    /** @var Account */
-    protected $account;
+    public static function hashPlayer(Player $player) : string 
+    {
+        return self::hash($player->getName(), $player->getAddress());
+    }
 
-    /** @var boolean */
-    protected $loggedInAutomatically;
+    public static function hash(string $username, string $address) : string 
+    {
+        $username = strtolower($username);
+        return "$username:$address";
+    }
 
     /**
      * @param Player $player
-     * @param Account $account
-     * @param boolean $loggedInAutomatically
-     * @return Session
+     * @return boolean True if the player can do more attempts. But if false, it means that the player was kicked
      */
-    public static function create(Player $player, Account $account, bool $loggedInAutomatically) : Session
+    public static function addAttempt(Player $player) : bool
     {
-        return new self($player, $account, $loggedInAutomatically);
+        if (!isset(self::$maxLoginAttempts[$loaderId = $player->getLoaderId()])) {
+            self::$maxLoginAttempts[$loaderId] = 0;
+        }
+
+        self::$maxLoginAttempts[$loaderId] += 1;
+        
+        if (self::$maxLoginAttempts[$loaderId] >= Loader::getInstance()->getSettings()->getMaxLoginAttempts()) {
+            unset(self::$maxLoginAttempts[$loaderId]);
+            $message = Loader::getInstance()->getMessages()->get('screen-max-attempts', null, null, '', false);
+            $player->close('', $message);
+            return false;
+        }
+        return true;
     }
-
-    public function __construct(
-        Player $player,
-        Account $account,
-        bool $loggedInAutomatically
-    )
-    {
-        $this->account = $account;
-        $this->player = $player;
-        $this->loggedInAutomatically = $loggedInAutomatically;
-    }
-
-    public function getPlayer() : Player
-    {
-        return $this->player;
-    }
-
-    public function getAccount() : Account
-    {
-        return $this->account;
-    }
-
-    public function wasLoggedInAutomatically() : bool 
-    {
-        return $this->loggedInAutomatically;
-    }
-
-    public function destroy(bool $disconnected)
-    {
-        SessionController::getInstance()->logout($this, $disconnected);
-    }
-
-
 }

@@ -21,64 +21,75 @@ declare (strict_types=1);
  * 
 **/ 
 
-namespace betterauth\session;
+namespace betterauth\session\task;
 
-use betterauth\provider\Account;
+use betterauth\Loader;
+use pocketmine\scheduler\Task;
 use pocketmine\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\scheduler\PluginTask;
+use pocketmine\Server;
+use SmartCommand\utils\SingletonTrait;
+use betterauth\session\AuthTimeout;
 
-class Session
+class LoginTimeoutTask extends PluginTask
 {
 
-    /** @var Player */
-    protected $player;
-
-    /** @var Account */
-    protected $account;
+    use SingletonTrait;
 
     /** @var boolean */
-    protected $loggedInAutomatically;
+    private static $enabled = false;
 
-    /**
-     * @param Player $player
-     * @param Account $account
-     * @param boolean $loggedInAutomatically
-     * @return Session
-     */
-    public static function create(Player $player, Account $account, bool $loggedInAutomatically) : Session
+    public static function isEnabled() : bool 
     {
-        return new self($player, $account, $loggedInAutomatically);
+        return self::$enabled;
+    }
+
+    /** @var array<int,AuthTimeout> */
+    protected $players = [];
+
+    /** @var integer */
+    protected $maxTimeTicks;
+
+    public static function init(
+        int $maxTimeTicks
+    )
+    {
+        Server::getInstance()->getScheduler()->scheduleRepeatingTask(
+            new self(Loader::getInstance(), $maxTimeTicks),
+            1
+        );
+        self::$enabled = true;
     }
 
     public function __construct(
-        Player $player,
-        Account $account,
-        bool $loggedInAutomatically
+        Plugin $owner,
+        int $maxTimeTicks
     )
     {
-        $this->account = $account;
-        $this->player = $player;
-        $this->loggedInAutomatically = $loggedInAutomatically;
+        parent::__construct($owner);
+        $this->maxTimeTicks = $maxTimeTicks;
     }
 
-    public function getPlayer() : Player
+    public function addPlayer(Player $player) 
     {
-        return $this->player;
+        $this->players[$player->getLoaderId()] = new AuthTimeout($player, $this->maxTimeTicks);
     }
 
-    public function getAccount() : Account
+    public function removePlayer(Player $player)
     {
-        return $this->account;
+        unset($this->players[$player->getLoaderId()]);
     }
 
-    public function wasLoggedInAutomatically() : bool 
+    public function getPlayerTimeout(Player $player)
     {
-        return $this->loggedInAutomatically;
+        return $this->players[$player->getLoaderId()] ?? null;
     }
 
-    public function destroy(bool $disconnected)
+    public function onRun($currentTick)
     {
-        SessionController::getInstance()->logout($this, $disconnected);
+        foreach ($this->players as $timeout) {
+            $timeout->tick();
+        }
     }
-
-
 }

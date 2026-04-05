@@ -23,10 +23,16 @@ declare (strict_types=1);
 
 namespace betterauth\listener;
 
+use betterauth\event\PlayerChangePasswordEvent;
 use betterauth\event\PlayerLoggedOutEvent;
 use betterauth\event\PlayerLoginSucessfullyEvent;
+use betterauth\event\PlayerRegisterEvent;
+use betterauth\Loader;
+use betterauth\session\AuthTimeout;
+use betterauth\session\task\LoginTimeoutTask;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
+use betterauth\utils\SystemUtils;
 use pocketmine\event\Listener;
 
 final class LoginListener implements Listener
@@ -52,11 +58,39 @@ final class LoginListener implements Listener
         $player = $event->getPlayer();
         $messageId = $event->wasLoggedInAutomatically() ? 'auto-login-sucessfully' : 'login-sucessfully';
         $this->messages->send($player, $messageId);
+
+        if (!Loader::getInstance()->allowNotLoggedInPlayerMove()) {
+            SystemUtils::freezePlayer($player, false);
+        }
+
+        if (LoginTimeoutTask::isEnabled()) {
+            LoginTimeoutTask::getInstance()->removePlayer($player);
+        }
     }
 
     /**
      * @priority LOWEST
      */
     public function onLogout(PlayerLoggedOutEvent $event)
+    {
+        if (!Loader::getInstance()->allowNotLoggedInPlayerMove() && !$event->wasDisconnected()) {
+            SystemUtils::freezePlayer($event->getPlayer(), true);
+        }
+
+        if (LoginTimeoutTask::isEnabled() && !$event->wasDisconnected()) {
+            LoginTimeoutTask::getInstance()->addPlayer($event->getPlayer());
+        }
+    }
+
+    /**
+     * @priority LOWEST
+     */
+    public function onChangePassword(PlayerChangePasswordEvent $event) 
+    {}
+
+    /**
+     * @priority LOWEST
+     */
+    public function onRegisterAccount(PlayerRegisterEvent $event)
     {}
 }

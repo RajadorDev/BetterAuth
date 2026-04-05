@@ -23,61 +23,48 @@ declare (strict_types=1);
 
 namespace betterauth\session;
 
-use betterauth\provider\Account;
+use betterauth\Loader;
+use betterauth\session\task\LoginTimeoutTask;
 use pocketmine\Player;
 
-class Session
+class AuthTimeout
 {
 
     /** @var Player */
     protected $player;
 
-    /** @var Account */
-    protected $account;
+    /** @var integer */
+    protected $maxTimeTicks;
 
-    /** @var boolean */
-    protected $loggedInAutomatically;
-
-    /**
-     * @param Player $player
-     * @param Account $account
-     * @param boolean $loggedInAutomatically
-     * @return Session
-     */
-    public static function create(Player $player, Account $account, bool $loggedInAutomatically) : Session
-    {
-        return new self($player, $account, $loggedInAutomatically);
-    }
+    /** @var integer */
+    protected $currentLoggedOutTicks = 0;
 
     public function __construct(
         Player $player,
-        Account $account,
-        bool $loggedInAutomatically
+        int $maxTimeTicks
     )
     {
-        $this->account = $account;
         $this->player = $player;
-        $this->loggedInAutomatically = $loggedInAutomatically;
+        $this->maxTimeTicks = $maxTimeTicks;
     }
 
-    public function getPlayer() : Player
+    public function getPlayer() : Player 
     {
         return $this->player;
     }
 
-    public function getAccount() : Account
+    public function tick()
     {
-        return $this->account;
+        $this->currentLoggedOutTicks++;
+        if ($this->currentLoggedOutTicks >= $this->maxTimeTicks) {
+            $this->destroy();
+            $this->getPlayer()->close('', Loader::getInstance()->getMessages()->get('login-timeout-screen', null, null, '', false));
+        }
     }
 
-    public function wasLoggedInAutomatically() : bool 
+    public function destroy()
     {
-        return $this->loggedInAutomatically;
-    }
-
-    public function destroy(bool $disconnected)
-    {
-        SessionController::getInstance()->logout($this, $disconnected);
+        LoginTimeoutTask::getInstance()->removePlayer($this->player);
     }
 
 

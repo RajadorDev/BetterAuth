@@ -49,6 +49,16 @@ class Settings
 
     const AUTO_UPDATE = 'auto-update';
 
+    const HIDE_PASSWORD_PREFIX = 'hide-password.';
+
+    const HIDE_PASSWORD_ENABLED = self::HIDE_PASSWORD_PREFIX . 'enabled';
+
+    const SHOW_PASSWORD_PERCENT = self::HIDE_PASSWORD_PREFIX . 'chars-percent';
+
+    const MAX_AUTH_TIMEOUT = 'max-auth-time';
+
+    const MAX_LOGIN_ATTEMPTS = 'max-login-attempts';
+
     /** @var Config */
     protected $file;
 
@@ -64,6 +74,11 @@ class Settings
         return $this->file;
     }
 
+    public function getPrefix() : string 
+    {
+        return $this->getValue('prefix', false, '');
+    }
+
     /**
      * @param string $identifier
      * @param boolean $nested
@@ -71,7 +86,7 @@ class Settings
      * @param boolean $warnConsoleWhenFail
      * @return mixed
      */
-    public function getValue(string $identifier, bool $nested = false, $default = null, bool $warnConsoleWhenFail = false)
+    public function getValue(string $identifier, bool $nested = false, $default = null, bool $warnConsoleWhenFail = true)
     {
         $result = $nested ? $this->file->getNested($identifier, null) : $this->file->get($identifier, null);
         if (is_null($result)) {
@@ -116,6 +131,27 @@ class Settings
     public function getBlockEventsMessageCooldown() : int 
     {
         return $this->getInteger(self::MESSAGE_EVENTS_COOLDOWN, 10, false);
+    }
+
+    public function isHidePasswordEnabled() : bool 
+    {
+        return $this->getBool(self::HIDE_PASSWORD_ENABLED, true, true);
+    }
+
+    public function getShowPasswordPercent() : int 
+    {
+        return intval(
+            $this->getValue(
+                self::SHOW_PASSWORD_PERCENT,
+                true,
+                20.0
+            )
+        );
+    }
+
+    public function getMaxLoginAttempts() : int 
+    {
+        return $this->getInteger(self::MAX_LOGIN_ATTEMPTS, 5, false);
     }
 
 }
