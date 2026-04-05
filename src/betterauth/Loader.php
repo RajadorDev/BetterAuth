@@ -37,6 +37,10 @@ use betterauth\utils\SystemMessages;
 use betterauth\provider\types\file\FileAccountProvider;
 use betterauth\room\LoggedOutRoom;
 use betterauth\session\SessionController;
+use pocketmine\plugin\Plugin;
+use rajadordev\autoupdater\api\CheckUpdateScheduler;
+use rajadordev\autoupdater\api\plugin\defaults\github\GitHubPluginUpdaterAPI;
+use rajadordev\autoupdater\api\PluginUpdaterChecker;
 use SmartCommand\command\SmartCommand;
 
 class Loader extends PluginBase
@@ -88,6 +92,33 @@ class Loader extends PluginBase
         $this->initListeners();
 
         $this->registerCommands();
+
+        $this->tryAutoUpdate();
+    }
+
+    protected function tryAutoUpdate()
+    {
+        if ($this->settings->getBool(Settings::AUTO_UPDATE, true, false)) {
+            $autoUpdaterPlugin = $this->getServer()->getPluginManager()->getPlugin('AutoPluginUpdater');
+
+            if ($autoUpdaterPlugin instanceof Plugin) {
+                $this->getLogger()->info("Searching for updates soon...");
+                CheckUpdateScheduler::getInstance()->schedule(
+                    new PluginUpdaterChecker(
+                        $this,
+                        GitHubPluginUpdaterAPI::createFromPlugin(
+                            $this,
+                            'RajadorDev',
+                            'BetterAuth'
+                        )
+                    )
+                );
+            } else {
+                $this->getLogger()->warning("AutoPluginUpdater is not enabled! Please install AutoPluginUpdater to update BetterAuth, SmartCommand automatically from: https://github.com/RajadorDev/AutoPluginUpdater");
+            }
+        } else {
+            $this->getLogger()->info("Auto update is disabled, the BetterAuth will not update automatically!");
+        }
     }
 
     public function setProvider(AccountProvider $provider)
