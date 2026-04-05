@@ -40,5 +40,11 @@ logged-out-room:
 # Auto atualizar o plugin usando a API do GitHub?
 auto-update: true
 
+# Ocultar alguns caracteres da senha quando o jogador registrar/trocar a senha
+hide-password:
+  # Se false: a senha será exibida completamente
+  enabled: true
+  # Porcentagem de caracteres que serão exibidos:
+  chars-percent: 20.0
 
 ...
