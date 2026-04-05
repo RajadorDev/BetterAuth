@@ -41,13 +41,13 @@ final class AuthListener implements Listener
     /** @var Loader */
     private $loader;
 
-    
+
     public function __construct(SessionController $session)
     {
-        $this->session  = $session;
+        $this->session = $session;
 
-        $this->loader   = Loader::getInstance();
-        $this->message  = $this->loader->getMessages();
+        $this->loader = Loader::getInstance();
+        $this->message = $this->loader->getMessages();
         $this->settings = $this->loader->getSettings();
 
     }
@@ -56,12 +56,11 @@ final class AuthListener implements Listener
      * @priority LOWEST
      * @ignoreCancelled TRUE
      */
-    public function onPreprocessCommand(PlayerCommandPreprocessEvent $event) 
+    public function onPreprocessCommand(PlayerCommandPreprocessEvent $event)
     {
         $commandLine = $event->getMessage();
 
-        if (!$this->loader->isAuthCommand($commandLine)) 
-        {
+        if (!$this->loader->isAuthCommand($commandLine)) {
             $this->message->send($event->getPlayer(), 'not-logged-in-command');
 
             $event->setCancelled(true);
@@ -72,30 +71,27 @@ final class AuthListener implements Listener
      * @priority LOWEST
      * @ignoreCancelled TRUE
      */
-    public function onMove(PlayerMoveEvent $event) 
+    public function onMove(PlayerMoveEvent $event)
     {
         $player = $event->getPlayer();
 
-        if ($this->loader->allowNotLoggedInPlayerMove()) 
-        {
+        if ($this->loader->allowNotLoggedInPlayerMove()) {
             return;
         }
 
-        if (!$this->session->isLoggedIn($player)) 
-        {
+        if (!$this->session->isLoggedIn($player)) {
             $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
         }
     }
 
-    
+
     public function onPreLogin(PlayerPreLoginEvent $event)
     {
         $playerName = $event->getPlayer()->getName();
-        
-        if ($this->session->getSessionByUsername($playerName) !== null) 
-        {
+
+        if ($this->session->getSessionByUsername($playerName) !== null) {
             $event->setKickMessage($this->message->get('screen-cant-join', '{username}', $playerName));
 
             $event->setCancelled(true);
@@ -122,25 +118,24 @@ final class AuthListener implements Listener
                     try {
                         $this->session->acceptLogin($player, $result, true);
 
-                    } catch (SessionAlreadyLoggedInException $error) {
+                        } catch (SessionAlreadyLoggedInException $error) {
 
-                        $player->close('', $this->message->get('session-already-created', null, null, 'Message not found', false));
+                            $player->close('', $this->message->get('session-already-created', null, null, 'Message not found', false));
+                        }
                     }
                 }
-            }
-        );
+            );
     }
 
     /**
      * @priority LOWEST
      * @ignoreCancelled TRUE
      */
-    public function onInteract(PlayerInteractEvent $event) 
+    public function onInteract(PlayerInteractEvent $event)
     {
         $player = $event->getPlayer();
 
-        if (!$this->session->isLoggedIn($player)) 
-        {
+        if (!$this->session->isLoggedIn($player)) {
             $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
@@ -155,8 +150,7 @@ final class AuthListener implements Listener
     {
         $player = $event->getPlayer();
 
-        if (!$this->session->isLoggedIn($player)) 
-        {
+        if (!$this->session->isLoggedIn($player)) {
             $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
@@ -171,8 +165,7 @@ final class AuthListener implements Listener
     {
         $player = $event->getPlayer();
 
-        if (!$this->session->isLoggedIn($player)) 
-        {
+        if (!$this->session->isLoggedIn($player)) {
             $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
@@ -187,19 +180,16 @@ final class AuthListener implements Listener
     {
         $entity = $event->getEntity();
 
-        if ($entity instanceof Player && !$this->session->isLoggedIn($entity)) 
-        {
+        if ($entity instanceof Player && !$this->session->isLoggedIn($entity)) {
             $event->setCancelled(true);
 
             return;
         }
 
-        if ($event instanceof EntityDamageByEntityEvent) 
-        {
+        if ($event instanceof EntityDamageByEntityEvent) {
             $entityDamager = $event->getDamager();
 
-            if ($entityDamager instanceof Player && !$this->session->isLoggedIn($entity)) 
-            {
+            if ($entityDamager instanceof Player && !$this->session->isLoggedIn($entity)) {
                 $event->setCancelled(true);
             }
         }
@@ -214,8 +204,7 @@ final class AuthListener implements Listener
         $player = $event->getPlayer();
 
         $session = $this->session->getSessionByUsername($player->getName());
-        if ($session instanceof Session) 
-        {
+        if ($session instanceof Session) {
             $session->destroy(true);
         }
     }

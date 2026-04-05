@@ -58,5 +58,5 @@ class PasswordArgument extends BaseArgument
             $maxChar
         ]);
     }
-    
+
 }

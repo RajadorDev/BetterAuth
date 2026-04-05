@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace betterauth\commands;
 
-use betterauth\command\rule\NotLoggedInCommandRule;
+use betterauth\commands\rule\NotLoggedInCommandRule;
 use betterauth\Loader;
 use betterauth\session\SessionController;
 use pocketmine\command\CommandSender;

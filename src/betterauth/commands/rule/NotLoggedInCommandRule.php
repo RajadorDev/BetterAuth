@@ -21,7 +21,7 @@ declare(strict_types=1);
  * 
  **/
 
-namespace betterauth\command\rule;
+namespace betterauth\commands\rule;
 
 use betterauth\session\SessionController;
 use pocketmine\command\CommandSender;
