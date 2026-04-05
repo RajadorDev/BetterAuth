@@ -57,6 +57,9 @@ class ChangePasswordCommand extends SmartCommand
 
     protected function prepare()
     {
+        $maxChar = Loader::getInstance()->getSettings()->getMaxPasswordLength();
+        $minChar = Loader::getInstance()->getSettings()->getMinPasswordLength();
+        $this->getMessages()->set('password-length', Loader::getInstance()->getMessages()->get('password-length', ['{min_char}', '{max_char}'], [$minChar, $maxChar]));
         $this->registerArgument(0, new PasswordArgument('password', true));
         $this->registerArgument(1, new PasswordArgument('password-confirm', true));
         $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule(), new CooldownRule(1000, true));

@@ -17,4 +17,5 @@ account-alredy-registered: '§fSua conta já está registrada'
 logout: "§fVocê foi deslogado da sua conta"
 login-timeout-screen: '§cVocê demorou muito para se autenticar!'
 screen-max-attempts: '§cVocê tentou logar muitas vezes'
+account-in-use: '§cJá tem alguém logado na sua conta'
 ...

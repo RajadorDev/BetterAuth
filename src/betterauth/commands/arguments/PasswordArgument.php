@@ -49,9 +49,6 @@ class PasswordArgument extends BaseArgument
 
     public function getWrongMessage(CommandMessages $commandMessages, string $argumentUsed): string
     {
-        $maxChar = Loader::getInstance()->getSettings()->getMaxPasswordLength();
-        $minChar = Loader::getInstance()->getSettings()->getMinPasswordLength();
-        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::RED . "Sua senha precisa ter no mínimo $minChar caracteres e no máximo $maxChar caracteres!");
         return parent::getWrongMessage($commandMessages, $argumentUsed);
     }
 }
