@@ -18,7 +18,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 
 use pocketmine\event\Listener;
-
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -42,6 +42,11 @@ final class AuthListener implements Listener
         $this->session = $session;
         $this->message = Loader::getInstance()->getMessages();
         $this->settings = Loader::getInstance()->getSettings();
+    }
+
+    public function onPreprocessCommand(PlayerCommandPreprocessEvent $event) 
+    {
+
     }
 
     public function onPreLogin(PlayerPreLoginEvent $event) 
