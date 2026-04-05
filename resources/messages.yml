@@ -1,7 +1,9 @@
 ---
-generic-error: "§cOcorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
+generic-error: "Ocorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
+login-sucessfully: "Você foi logado com §a§lSucesso§r§7!"
+auto-login-sucessfully: "Você foi logado automaticamente!"
+already-logged-in: '§cVocê já está logado!'
 interation-not-logged: "§7Você precisa logar para interagir ou se mover"
 screen-cant-join: "§fJá existe uma sessão com o username §e\"{player_name}\""
-login-sucessfully: "§fLogado com sucesso"
-already-logged: "§fVocê já está logado"
+not-logged-in-command: '§cVocê precisa logar para executar outros comandos!'
 ...

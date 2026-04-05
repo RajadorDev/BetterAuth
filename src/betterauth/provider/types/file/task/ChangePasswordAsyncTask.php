@@ -21,64 +21,36 @@ declare (strict_types=1);
  * 
 **/ 
 
-namespace betterauth\session;
+namespace betterauth\provider\types\file\task;
 
 use betterauth\provider\Account;
-use pocketmine\Player;
+use betterauth\provider\exception\WrongPasswordException;
 
-class Session
+class ChangePasswordAsyncTask extends FileAccountProcessAsyncTask
 {
 
-    /** @var Player */
-    protected $player;
-
-    /** @var Account */
-    protected $account;
-
-    /** @var boolean */
-    protected $loggedInAutomatically;
-
-    /**
-     * @param Player $player
-     * @param Account $account
-     * @param boolean $loggedInAutomatically
-     * @return Session
-     */
-    public static function create(Player $player, Account $account, bool $loggedInAutomatically) : Session
-    {
-        return new self($player, $account, $loggedInAutomatically);
-    }
-
     public function __construct(
-        Player $player,
-        Account $account,
-        bool $loggedInAutomatically
+        string $filePath,
+        string $rawCheckPassword,
+        string $newPasswordRaw
     )
     {
-        $this->account = $account;
-        $this->player = $player;
-        $this->loggedInAutomatically = $loggedInAutomatically;
+        parent::__construct([
+            'check_password' => $rawCheckPassword,
+            'new_password' => $newPasswordRaw
+        ], $filePath);
     }
 
-    public function getPlayer() : Player
+    protected function processAccountAndResult(Account $account, array $safeVarValues)
     {
-        return $this->player;
+        $checkPassword = $safeVarValues['check_password'];
+        $newPassword = $safeVarValues['new_password'];
+        try {
+            $account->tryChangePassword($checkPassword, $newPassword);
+            $account->save($safeVarValues['file_path']);
+            return $account;
+        } catch (WrongPasswordException $e) {
+            return $e;
+        }
     }
-
-    public function getAccount() : Account
-    {
-        return $this->account;
-    }
-
-    public function wasLoggedInAutomatically() : bool 
-    {
-        return $this->loggedInAutomatically;
-    }
-
-    public function destroy()
-    {
-        SessionController::getInstance()->logout($this);
-    }
-
-
 }

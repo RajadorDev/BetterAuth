@@ -47,6 +47,8 @@ class Settings
 
     const LOGGET_OUT_ALLOW_MOVE = self::LOGGOUT_ROOM_PREFIX . 'allow-move';
 
+    const AUTO_UPDATE = 'auto-update';
+
     /** @var Config */
     protected $file;
 

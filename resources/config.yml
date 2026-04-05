@@ -20,7 +20,7 @@ password:
 
 # Cooldown da mensagem enviada quando o jogador é bloquado 
 # de fazer uma ação por não estar logado (em segundos)
-block-alert-cooldown: 10
+block-alert-cooldown: 15
 
 # Ativar auto login por endereço IP (Recomendado)
 auto-login: true

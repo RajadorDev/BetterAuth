@@ -37,6 +37,7 @@ final class AuthListener implements Listener
     /** @var Settings */
     private $settings;
 
+    
     public function __construct(SessionController $session)
     {
         $this->session = $session;
@@ -49,40 +50,15 @@ final class AuthListener implements Listener
 
     }
 
-    public function onPreLogin(PlayerPreLoginEvent $event) 
+    public function onPreprocessCommand(PlayerCommandPreprocessEvent $event) 
     {
-        $player = $event->getPlayer();
 
-        $event->setKickMessage($this->message->get("screen-cant-join", "{player_name}", $player->getName()));
-
-        if ($this->session->getSessionByUsername($player->getName()) !== null) 
-        {
-            $event->setCancelled(true);
-        }
     }
 
-    public function onLogin(PlayerLoginEvent $event)
-    {
-        $player = $event->getPlayer();
-
-        Loader::getInstance()->getProvider()->getAccount($player->getName())
-        ->then(
-            function ($result) use ($player) 
-            {
-                if ($result instanceof Account && $result->matchPlayerAddress($player)) 
-                {
-                    try {
-                        SessionController::getInstance()->acceptLogin($player, $result, true);
-
-                    } catch (SessionAlreadyLoggedInException $error) {
-
-                        $player->close('', $this->message->get("already-logged"));
-                    }
-                }
-            }
-        );
-    }
-
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onMove(PlayerMoveEvent $event) 
     {
         $player = $event->getPlayer();
@@ -95,6 +71,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onInteract(PlayerInteractEvent $event) 
     {
         $player = $event->getPlayer();
@@ -107,6 +87,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onBreak(BlockPlaceEvent $event)
     {
         $player = $event->getPlayer();
@@ -119,6 +103,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onPlace(BlockPlaceEvent $event)
     {
         $player = $event->getPlayer();
@@ -131,6 +119,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onDamage(EntityDamageEvent $event)
     {
         $entity = $event->getEntity();
@@ -153,6 +145,10 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onQuit(PlayerQuitEvent $event)
     {
         $player = $event->getPlayer();
