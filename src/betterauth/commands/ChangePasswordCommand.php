@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace betterauth\commands;
 
-use betterauth\command\rule\NotLoggedInCommandRule;
-use Betterauth\Commands\Arguments\PasswordArgument;
+use betterauth\commands\rule\NotLoggedInCommandRule;
+use betterauth\commands\arguments\PasswordArgument;
 use betterauth\event\PlayerChangePasswordEvent;
 use betterauth\Loader;
 use betterauth\provider\exception\AccountNotFoundException;
