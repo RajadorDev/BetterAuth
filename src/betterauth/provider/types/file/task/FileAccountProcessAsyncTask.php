@@ -26,6 +26,8 @@ namespace betterauth\provider\types\file\task;
 use betterauth\provider\Account;
 use betterauth\provider\exception\AccountNotFoundException;
 use betterauth\utils\async\AsyncPromiseTask;
+use betterauth\utils\DynamicObject;
+use Exception;
 
 abstract class FileAccountProcessAsyncTask extends AsyncPromiseTask
 {
@@ -52,12 +54,22 @@ abstract class FileAccountProcessAsyncTask extends AsyncPromiseTask
 
         $jsonData = json_decode($fileData, true);
 
-        return $this->processAccountAndResult(
+        $result = $this->processAccountAndResult(
             Account::unserialize(
                 $jsonData
             ),
             $safeVarValues
         );
+
+        if ($result instanceof DynamicObject) {
+            return serialize($result->jsonSerialize());
+        } else if ($result instanceof Exception) {
+            return serialize($result);
+        } else if (self::isSafeThreadValue($result)) {
+            return serialize($result);
+        }
+
+        throw new Exception("Value: " . gettype($result) . ' can\'t be async result');
 
     }
 
