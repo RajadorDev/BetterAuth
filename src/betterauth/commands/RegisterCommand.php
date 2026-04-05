@@ -55,6 +55,7 @@ class RegisterCommand extends SmartCommand
 
     protected function prepare()
     {
+        $this->setPrefix(Loader::getInstance()->getSettings()->getPrefix());
         $this->registerArgument(0, new PasswordArgument('password', true));
         $this->registerArgument(1, new PasswordArgument('password-confirm', Loader::getInstance()->getSettings()->needToConfirmPassword()));
         $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
