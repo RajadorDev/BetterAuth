@@ -18,5 +18,7 @@ login-timeout-screen: '§cVocê demorou muito para se autenticar!'
 screen-max-attempts: '§cVocê tentou logar muitas vezes'
 session-already-created: "§cJá há um usuario logado na conta §f{username}§c!"
 password-length: "§cSua senha precisa ter no mínimo §f{min_char} §ccaracteres e no máximo §f{max_char} §ccaracteres!"
-join-message: "§8----====(§aBetter§bAuth§8)====----\n§8-\n§8-§7  Bem vindo ao servidor §f{username}§7!\n§8-\n§8-  §7IP: 0.0.0.0\n§8-  §7Porta: §f{server_port}\n§8-  \n§8- Autenticação protegida e criptografada pelo §aBetter§bAuth§7!\n§8- "
+join-message: "§8----====(§aBetter§bAuth§8)====----\n§8-\n§8-§7  Bem vindo ao servidor §f{username}§7!\n§8-\n§8-  §7IP: 0.0.0.0\n§8-  §7Porta: §f{server_port}\n§8-  \n§8-  §7Autenticação protegida e criptografada pelo §aBetter§bAuth§7!\n§8- "
+waiting-login: "Bem vindo de volta, para logar use: §f/login <senha: string>"
+waiting-register: "Bem vindo! Para se registrar use: §f/register <senha: string> {confirmation}"
 ...

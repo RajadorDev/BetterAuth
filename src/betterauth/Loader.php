@@ -203,7 +203,10 @@ class Loader extends PluginBase
 
         $commandName = array_shift($splitedCommand);
 
+        $commandName = substr($commandName, 1);
+
         $commandFound = Server::getInstance()->getCommandMap()->getCommand($commandName);
+
 
         return (
             $commandFound instanceof Command
@@ -249,7 +252,7 @@ class Loader extends PluginBase
 
     public function teleportWhenJoin(Player $player)
     {
-        
+        //TODO
     }
 
     protected function initListeners() 

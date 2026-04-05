@@ -35,13 +35,14 @@ class PasswordArgument extends BaseArgument
             $name,
             'string',
             $required,
-            function (&$given) {
+            function (&$given) : bool {
                 if (strlen($given) > Loader::getInstance()->getSettings()->getMaxPasswordLength()) {
                     return false;
                 }
                 if (strlen($given) < Loader::getInstance()->getSettings()->getMinPasswordLength()) {
                     return false;
                 }
+                return true;
             }
         );
     }

@@ -21,7 +21,7 @@ declare(strict_types=1);
  * 
  **/
 
-namespace betterauth\command\rule;
+namespace betterauth\commands\rule;
 
 use betterauth\session\SessionController;
 use pocketmine\command\CommandSender;
@@ -34,7 +34,7 @@ class NotLoggedInCommandRule implements CommandSenderRule
     public function parse(CommandSender $sender, $command, int $executionType): bool
     {
         if ($sender instanceof Player) {
-            return SessionController::getInstance()->isLoggedIn($sender);
+            return !SessionController::getInstance()->isLoggedIn($sender);
         }
         return false;
     }

@@ -2,6 +2,7 @@
 
 namespace betterauth\listener;
 
+use betterauth\event\PlayerAutomaticallyLoginFailEvent;
 use betterauth\Loader;
 use betterauth\provider\Account;
 use betterauth\session\exception\SessionAlreadyLoggedInException;
@@ -10,7 +11,7 @@ use betterauth\session\SessionController;
 
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
-
+use betterauth\utils\SystemUtils;
 use pocketmine\Player;
 
 use pocketmine\event\block\BlockPlaceEvent;
@@ -25,6 +26,7 @@ use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\utils\EventUtils;
 
 final class AuthListener implements Listener
 {
@@ -60,7 +62,7 @@ final class AuthListener implements Listener
     {
         $commandLine = $event->getMessage();
 
-        if (!$this->loader->isAuthCommand($commandLine)) {
+        if (isset($commandLine[0]) && $commandLine[0] === '/' && !SessionController::getInstance()->isLoggedIn($event->getPlayer()) && !$this->loader->isAuthCommand($commandLine)) {
             $this->message->send($event->getPlayer(), 'not-logged-in-command');
 
             $event->setCancelled(true);
@@ -87,6 +89,10 @@ final class AuthListener implements Listener
     }
 
 
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
     public function onPreLogin(PlayerPreLoginEvent $event)
     {
         $playerName = $event->getPlayer()->getName();
@@ -98,24 +104,49 @@ final class AuthListener implements Listener
         }
     }
 
+    /**
+     * @priority NORMAL
+     */
     public function onJoin(PlayerJoinEvent $event)
     {
         $player = $event->getPlayer();
 
+        $this->loader->onPlayerJoin($player);
+
+        if (!$this->settings->isAutoLoginEnabled()) 
+        {
+            EventUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
+            return;
+        }
+
         Loader::getInstance()->getProvider()->getAccount($player->getName())
-            ->then(
-                function ($result) use ($player) {
-                    if ($result instanceof Account && $result->matchAutoLogin($player)) {
-                        try {
-                            SessionController::getInstance()->acceptLogin($player, $result, true);
-
-                        } catch (SessionAlreadyLoggedInException $error) {
-
-                            $player->close('', $this->message->get('session-already-created', null, null, 'Message not found', false));
-                        }
-                    }
+        ->then(
+            function ($result) use ($player) 
+            {
+                if (!SystemUtils::isValidPlayer($player)) {
+                    return;
                 }
-            );
+
+                if ($result instanceof Account && $result->matchAutoLogin($player)) 
+                {
+                    try {
+                        $this->session->acceptLogin($player, $result, true);
+                    } catch (SessionAlreadyLoggedInException $error) {
+                        $player->close('', $this->message->get('session-already-created', null, null, 'Message not found', false));
+                    }
+                } else {
+                    EventUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
+                }
+            }
+        )->catch(
+            function () use ($player) {
+                if (!SystemUtils::isValidPlayer($player)) {
+                    return;
+                }
+
+                SystemUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
+            }
+        );
     }
 
     /**
