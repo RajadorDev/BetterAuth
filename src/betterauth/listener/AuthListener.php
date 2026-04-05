@@ -106,6 +106,13 @@ final class AuthListener implements Listener
     {
         $player = $event->getPlayer();
 
+        $this->loader->onPlayerJoin($player);
+
+        if (!$this->settings->isAutoLoginEnabled()) 
+        {
+            return;
+        }
+
         Loader::getInstance()->getProvider()->getAccount($player->getName())
         ->then(
             function ($result) use ($player) 
