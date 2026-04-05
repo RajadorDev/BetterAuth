@@ -91,10 +91,11 @@ final class AuthListener implements Listener
     public function onPreLogin(PlayerPreLoginEvent $event)
     {
         $playerName = $event->getPlayer()->getName();
-
-        $event->setKickMessage($this->message->get('screen-cant-join', '{username}', $playerName));
+        
         if ($this->session->getSessionByUsername($playerName) !== null) 
         {
+            $event->setKickMessage($this->message->get('screen-cant-join', '{username}', $playerName));
+
             $event->setCancelled(true);
         }
     }
@@ -107,7 +108,7 @@ final class AuthListener implements Listener
         ->then(
             function ($result) use ($player) 
             {
-                if ($result instanceof Account && $result->matchPlayerAddress($player)) 
+                if ($result instanceof Account && $result->matchAutoLogin($player)) 
                 {
                     try {
                         SessionController::getInstance()->acceptLogin($player, $result, true);
