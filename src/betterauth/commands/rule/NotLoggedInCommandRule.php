@@ -34,7 +34,7 @@ class NotLoggedInCommandRule implements CommandSenderRule
     public function parse(CommandSender $sender, $command, int $executionType): bool
     {
         if ($sender instanceof Player) {
-            return SessionController::getInstance()->isLoggedIn($sender);
+            return !SessionController::getInstance()->isLoggedIn($sender);
         }
         return false;
     }
