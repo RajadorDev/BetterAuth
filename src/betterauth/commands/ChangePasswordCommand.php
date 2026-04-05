@@ -35,18 +35,19 @@ use SmartCommand\command\CommandArguments;
 use SmartCommand\command\rule\defaults\CooldownRule;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
+use SmartCommand\message\CommandMessages;
 use SmartCommand\utils\MemberPermissionTrait;
 
 class ChangePasswordCommand extends SmartCommand
 {
-    public function __construct()
+    public function __construct(CommandMessages $commandMessages)
     {
         return parent::__construct(
             'changepassword',
             'change your password',
             self::DEFAULT_USAGE_PREFIX,
             ['changepass'],
-            $messages = null
+            $commandMessages
         );
     }
 
@@ -69,28 +70,28 @@ class ChangePasswordCommand extends SmartCommand
             $password,
             $passwordConfirm
         )->then(
-            function ($result) use ($passwordConfirm, $sender) {
-                if (!SystemUtils::isValidPlayer($sender)) {
-                    return;
-                }
-                try {
-                    if ($result instanceof Exception) {
-                        throw $result;
+                function ($result) use ($passwordConfirm, $sender) {
+                    if (!SystemUtils::isValidPlayer($sender)) {
+                        return;
                     }
-                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('change-password-successfully', '{senha}', $passwordConfirm));
+                    try {
+                        if ($result instanceof Exception) {
+                            throw $result;
+                        }
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('change-password-successfully', '{password}', $passwordConfirm));
 
-                } catch (WrongPasswordException $error) {
-                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('wrong-password-confirm'));
-                } catch (AccountNotFoundException $error) {
-                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-not-found'));
+                    } catch (WrongPasswordException $error) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('wrong-password-confirm'));
+                    } catch (AccountNotFoundException $error) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-not-found'));
+                    }
                 }
-            }
-        )->catch(
-            function () use ($sender) {
-                if(SystemUtils::isValidPlayer($sender)) {
-                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+            )->catch(
+                function () use ($sender) {
+                    if (SystemUtils::isValidPlayer($sender)) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+                    }
                 }
-            }
-        );
+            );
     }
 }

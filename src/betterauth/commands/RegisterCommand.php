@@ -27,23 +27,27 @@ use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
 use betterauth\Loader;
 use betterauth\provider\Account;
+use betterauth\provider\exception\AccountAlreadyRegisteredException;
 use betterauth\session\SessionController;
+use betterauth\utils\SystemUtils;
+use Exception;
 use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
+use SmartCommand\message\CommandMessages;
 use SmartCommand\utils\MemberPermissionTrait;
 
 class RegisterCommand extends SmartCommand
 {
-    public function __construct()
+    public function __construct(CommandMessages $commandMessages)
     {
         return parent::__construct(
             'register',
             'register in ther server',
             self::DEFAULT_USAGE_PREFIX,
             ['registrar'],
-            $messages = null
+            $commandMessages
         );
     }
 
@@ -61,21 +65,37 @@ class RegisterCommand extends SmartCommand
         if (!is_null(SessionController::getInstance()->getPlayerSession($sender))) {
             return;
         }
-        $passwrod = $args->getValue('password');
-        if($args->has('password-confirm')) {
-            $passwrodConfirm = $args->getValue('password-confirm');
-            if ($passwrod !== $passwrodConfirm) {
+        $password = $args->getValue('password');
+        if ($args->has('password-confirm')) {
+            $passwordConfirm = $args->getValue('password-confirm');
+            if ($password !== $passwordConfirm) {
                 $sender->sendMessage(Loader::getInstance()->getMessages()->get('passwords-dont-match'));
                 return;
             }
         }
-        Account::create(
-            strtolower($sender->getName()),
-            $passwrod,
-            $sender->getAddress(),
-            $sender->getClientId()
-        );
-        $sender->sendMessage(Loader::getInstance()->getMessages()->get('registered-successfully'));
-        return;
+        Loader::getInstance()->getProvider()->tryRegister(
+            $sender,
+            $password
+        )->then(
+                function ($result) use ($password, $sender) {
+                    if (!SystemUtils::isValidPlayer($sender)) {
+                        return;
+                    }
+                    try {
+                        if ($result instanceof Exception) {
+                            throw $result;
+                        }
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-registered', '{password}', $password));
+                    } catch (AccountAlreadyRegisteredException $error) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-alredy-registered'));
+                    }
+                }
+            )->then(
+                function () use ($sender) {
+                    if (SystemUtils::isValidPlayer($sender)) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+                    }
+                }
+            );
     }
 }

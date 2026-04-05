@@ -1,5 +1,5 @@
 ---
-registered-successfully: "Voce foi registrado com sucesso!"
+registered-successfully: "Voce foi registrado com sucesso! Sua senha: {password}"
 passwords-dont-match: "As suas palavras passe não se coincidem!"
 password-confirm-required: "Confirme a sua senha: /registrar <senha> <confirmar-senha>"
 player-loged-in-sucessfully: "Logado com sucesso"
@@ -8,9 +8,10 @@ login-sucessfully: "Você foi logado com §a§lSucesso§r§7!"
 change-password: "voce trocou a sua senha nova senha: "
 generic-error: "Ocorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
 already-logged-in: '§cVocê já está logado!'
-change-password-successfully: "Voce trocou sua senha, nova senha: {senha}"
+change-password-successfully: "Voce trocou sua senha, nova senha: {password}"
 wrong-password-confirm: "A sua senha atual está incorreta"
 interation-not-logged: "§7Você precisa logar para interagir ou se mover"
 screen-cant-join: "§fJá existe uma sessão com o username §e\"{player_name}\""
 not-logged-in-command: '§cVocê precisa logar para executar outros comandos!'
+account-alredy-registered: 'Sua conta já está registrada'
 ...

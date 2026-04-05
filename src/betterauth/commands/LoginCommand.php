@@ -36,18 +36,19 @@ use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
+use SmartCommand\message\CommandMessages;
 use SmartCommand\utils\MemberPermissionTrait;
 
 class LoginCommand extends SmartCommand
 {
-    public function __construct()
+    public function __construct(CommandMessages $commandMessages)
     {
         return parent::__construct(
             'login',
             'Log-in the server',
             self::DEFAULT_USAGE_PREFIX,
             ['logar'],
-            $messages = null
+            $commandMessages
         );
     }
 

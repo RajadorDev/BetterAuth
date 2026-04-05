@@ -30,19 +30,20 @@ use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
+use SmartCommand\message\CommandMessages;
 use SmartCommand\utils\MemberPermissionTrait;
 
 class LogoutCommand extends SmartCommand
 {
     use MemberPermissionTrait;
-    public function __construct()
+    public function __construct(CommandMessages $commandMessages)
     {
         return parent::__construct(
             'logout',
             'logout of ther server',
             self::DEFAULT_USAGE_PREFIX,
             [],
-            $messages = null
+            $commandMessages
         );
     }
 
