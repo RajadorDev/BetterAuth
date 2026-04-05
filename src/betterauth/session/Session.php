@@ -75,9 +75,9 @@ class Session
         return $this->loggedInAutomatically;
     }
 
-    public function destroy()
+    public function destroy(bool $disconnected)
     {
-        SessionController::getInstance()->logout($this);
+        SessionController::getInstance()->logout($this, $disconnected);
     }
 
 
