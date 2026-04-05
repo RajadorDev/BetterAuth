@@ -20,6 +20,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
@@ -61,7 +62,7 @@ final class AuthListener implements Listener
 
         if (!$this->loader->isAuthCommand($commandLine)) 
         {
-            $this->message->send($event->getPlayer(), "not-logged-in-command");
+            $this->message->send($event->getPlayer(), 'not-logged-in-command');
 
             $event->setCancelled(true);
         }
@@ -75,26 +76,33 @@ final class AuthListener implements Listener
     {
         $player = $event->getPlayer();
 
+        if ($this->loader->allowNotLoggedInPlayerMove()) 
+        {
+            return;
+        }
+
         if (!$this->session->isLoggedIn($player)) 
         {
-            $this->message->sendCooldownMessage($player, "interation-not-logged", $this->settings->getBlockEventsMessageCooldown());
+            $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
         }
     }
 
+    
     public function onPreLogin(PlayerPreLoginEvent $event)
     {
         $playerName = $event->getPlayer()->getName();
-
-        $event->setKickMessage($this->message->get("screen-cant-join", "{player_name}", $playerName));
+        
         if ($this->session->getSessionByUsername($playerName) !== null) 
         {
+            $event->setKickMessage($this->message->get('screen-cant-join', '{username}', $playerName));
+
             $event->setCancelled(true);
         }
     }
 
-    public function onLogin(PlayerLoginEvent $event)
+    public function onJoin(PlayerJoinEvent $event)
     {
         $player = $event->getPlayer();
 
@@ -102,14 +110,14 @@ final class AuthListener implements Listener
         ->then(
             function ($result) use ($player) 
             {
-                if ($result instanceof Account && $result->matchPlayerAddress($player)) 
+                if ($result instanceof Account && $result->matchAutoLogin($player)) 
                 {
                     try {
                         SessionController::getInstance()->acceptLogin($player, $result, true);
 
                     } catch (SessionAlreadyLoggedInException $error) {
 
-                        $player->close('', $this->message->get("already-logged"));
+                        $player->close('', $this->message->get('session-already-created', null, null, 'Message not found', false));
                     }
                 }
             }
@@ -126,7 +134,7 @@ final class AuthListener implements Listener
 
         if (!$this->session->isLoggedIn($player)) 
         {
-            $this->message->sendCooldownMessage($player, "interation-not-logged", $this->settings->getBlockEventsMessageCooldown());
+            $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
         }
@@ -142,7 +150,7 @@ final class AuthListener implements Listener
 
         if (!$this->session->isLoggedIn($player)) 
         {
-            $this->message->sendCooldownMessage($player, "interation-not-logged", $this->settings->getBlockEventsMessageCooldown());
+            $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
         }
@@ -158,7 +166,7 @@ final class AuthListener implements Listener
 
         if (!$this->session->isLoggedIn($player)) 
         {
-            $this->message->sendCooldownMessage($player, "interation-not-logged", $this->settings->getBlockEventsMessageCooldown());
+            $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
         }
