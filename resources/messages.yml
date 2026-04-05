@@ -10,3 +10,7 @@ generic-error: "Ocorreu um erro desconhecido ao se autenticar. Tente novamente m
 already-logged-in: '§cVocê já está logado!'
 change-password-successfully: "Voce trocou sua senha, nova senha: {senha}"
 wrong-password-confirm: "A sua senha atual está incorreta"
+interation-not-logged: "§7Você precisa logar para interagir ou se mover"
+screen-cant-join: "§fJá existe uma sessão com o username §e\"{player_name}\""
+not-logged-in-command: '§cVocê precisa logar para executar outros comandos!'
+...

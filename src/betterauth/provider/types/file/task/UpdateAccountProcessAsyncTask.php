@@ -39,12 +39,12 @@ class UpdateAccountProcessAsyncTask extends AsyncPromiseTask
         ], true);
     }
 
-    protected function processAndResult(array $safeVarValues)
+    protected function processAndSerializeResult(array $safeVarValues)
     {
         $path = $safeVarValues['file_path'];
 
         if (!file_exists($path)) {
-            return new AccountNotFoundException("Account $path does not found");
+            return serialize(new AccountNotFoundException("Account $path does not found"));
         }
         $accountData = $safeVarValues['account'];
 
@@ -52,7 +52,7 @@ class UpdateAccountProcessAsyncTask extends AsyncPromiseTask
         $account = DynamicObject::globalUnserialize($accountData);
         assert($account instanceof Account);
         $account->save($path);
-        return true;
+        return serialize(true);
     }
 
 }
