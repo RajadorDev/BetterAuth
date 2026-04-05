@@ -39,6 +39,7 @@ use betterauth\utils\SystemMessages;
 use betterauth\provider\types\file\FileAccountProvider;
 use betterauth\room\LoggedOutRoom;
 use betterauth\session\SessionController;
+use betterauth\session\task\LoginTimeoutTask;
 use pocketmine\command\Command;
 use pocketmine\plugin\Plugin;
 use rajadordev\autoupdater\api\CheckUpdateScheduler;
@@ -100,6 +101,20 @@ class Loader extends PluginBase
         $this->registerCommands();
 
         $this->tryAutoUpdate();
+
+        $this->registerTimeoutTask();
+    }
+
+    protected function registerTimeoutTask()
+    {
+        $maxTime = $this->settings->getInteger(Settings::MAX_AUTH_TIMEOUT, 25, false);
+
+        if ($maxTime > 0) {
+            LoginTimeoutTask::init($maxTime * 20);
+            $this->getLogger()->info("Max auth time setted as $maxTime seconds");
+        } else {
+            $this->getLogger()->info("Auth timout is disabled! Players can keel online even if not login");
+        }
     }
 
     protected function tryAutoUpdate()

@@ -55,6 +55,10 @@ class Settings
 
     const SHOW_PASSWORD_PERCENT = self::HIDE_PASSWORD_PREFIX . 'chars-percent';
 
+    const MAX_AUTH_TIMEOUT = 'max-auth-time';
+
+    const MAX_LOGIN_ATTEMPTS = 'max-login-attempts';
+
     /** @var Config */
     protected $file;
 
@@ -68,6 +72,11 @@ class Settings
     public function getFile() : Config
     {
         return $this->file;
+    }
+
+    public function getPrefix() : string 
+    {
+        return $this->getValue('prefix', false, '');
     }
 
     /**
@@ -138,6 +147,11 @@ class Settings
                 20.0
             )
         );
+    }
+
+    public function getMaxLoginAttempts() : int 
+    {
+        return $this->getInteger(self::MAX_LOGIN_ATTEMPTS, 5, false);
     }
 
 }

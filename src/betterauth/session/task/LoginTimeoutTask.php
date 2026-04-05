@@ -21,30 +21,75 @@ declare (strict_types=1);
  * 
 **/ 
 
-namespace betterauth\event;
+namespace betterauth\session\task;
 
-use betterauth\provider\Account;
-use pocketmine\event\player\PlayerEvent;
+use betterauth\Loader;
+use pocketmine\scheduler\Task;
 use pocketmine\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\scheduler\PluginTask;
+use pocketmine\Server;
+use SmartCommand\utils\SingletonTrait;
+use betterauth\session\AuthTimeout;
 
-abstract class PlayerAccountEvent extends PlayerEvent
+class LoginTimeoutTask extends PluginTask
 {
 
-    /** @var Account */
-    protected $account;
+    use SingletonTrait;
 
-    public function __construct(
-        Player $player,
-        Account $account
+    /** @var boolean */
+    private static $enabled = false;
+
+    public static function isEnabled() : bool 
+    {
+        return self::$enabled;
+    }
+
+    /** @var array<int,AuthTimeout> */
+    protected $players = [];
+
+    /** @var integer */
+    protected $maxTimeTicks;
+
+    public static function init(
+        int $maxTimeTicks
     )
     {
-        $this->player = $player;
-        $this->account = $account;
+        Server::getInstance()->getScheduler()->scheduleRepeatingTask(
+            new self(Loader::getInstance(), $maxTimeTicks),
+            1
+        );
+        self::$enabled = true;
     }
 
-    public function getAccount() : Account
+    public function __construct(
+        Plugin $owner,
+        int $maxTimeTicks
+    )
     {
-        return $this->account;
+        parent::__construct($owner);
+        $this->maxTimeTicks = $maxTimeTicks;
     }
 
+    public function addPlayer(Player $player) 
+    {
+        $this->players[$player->getLoaderId()] = new AuthTimeout($player, $this->maxTimeTicks);
+    }
+
+    public function removePlayer(Player $player)
+    {
+        unset($this->players[$player->getLoaderId()]);
+    }
+
+    public function getPlayerTimeout(Player $player)
+    {
+        return $this->players[$player->getLoaderId()] ?? null;
+    }
+
+    public function onRun($currentTick)
+    {
+        foreach ($this->players as $timeout) {
+            $timeout->tick();
+        }
+    }
 }

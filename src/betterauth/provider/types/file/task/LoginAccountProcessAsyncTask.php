@@ -38,6 +38,12 @@ class LoginAccountProcessAsyncTask extends FileAccountProcessAsyncTask
 
     protected function processAccountAndResult(Account $account, array $safeVarValues)
     {
-        return $account->matchPassword($safeVarValues['password']) ? true : new WrongPasswordException("Wrong {$account->getUsername()} password");
+        if ($account->matchPassword($safeVarValues['password'])) {
+            $account->updateLastLogin();
+            $account->save($safeVarValues['file_path']);
+            return $account;
+        }
+
+        return new WrongPasswordException("Wrong {$account->getUsername()} password");
     }
 }
