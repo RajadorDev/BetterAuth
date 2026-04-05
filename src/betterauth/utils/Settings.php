@@ -41,7 +41,7 @@ class Settings
 
     const LOGGED_OUT_ROOM_ENABLED = self::LOGGOUT_ROOM_PREFIX . 'enabled';
 
-    const LOGGED_OUT_WORLD = self::LOGGED_OUT_ROOM_ENABLED . 'world';
+    const LOGGED_OUT_WORLD = self::LOGGOUT_ROOM_PREFIX . 'world';
 
     const LOGGED_OUT_TARGET_WORLD = self::LOGGOUT_ROOM_PREFIX . 'target-world';
 
@@ -58,6 +58,10 @@ class Settings
     const MAX_AUTH_TIMEOUT = 'max-auth-time';
 
     const MAX_LOGIN_ATTEMPTS = 'max-login-attempts';
+
+    const JOIN_PLAYER_TELEPORT = 'join-player-teleport';
+
+    const AUTO_LOGIN = 'auto-login';
 
     /** @var Config */
     protected $file;
@@ -152,6 +156,11 @@ class Settings
     public function getMaxLoginAttempts() : int 
     {
         return $this->getInteger(self::MAX_LOGIN_ATTEMPTS, 5, false);
+    }
+
+    public function isAutoLoginEnabled() : bool 
+    {
+        return $this->getBool(self::AUTO_LOGIN, true, false);
     }
 
 }
