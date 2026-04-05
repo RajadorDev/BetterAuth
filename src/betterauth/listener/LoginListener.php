@@ -28,6 +28,8 @@ use betterauth\event\PlayerLoggedOutEvent;
 use betterauth\event\PlayerLoginSucessfullyEvent;
 use betterauth\event\PlayerRegisterEvent;
 use betterauth\Loader;
+use betterauth\session\AuthTimeout;
+use betterauth\session\task\LoginTimeoutTask;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
 use betterauth\utils\SystemUtils;
@@ -56,6 +58,14 @@ final class LoginListener implements Listener
         $player = $event->getPlayer();
         $messageId = $event->wasLoggedInAutomatically() ? 'auto-login-sucessfully' : 'login-sucessfully';
         $this->messages->send($player, $messageId);
+
+        if (!Loader::getInstance()->allowNotLoggedInPlayerMove()) {
+            SystemUtils::freezePlayer($player, false);
+        }
+
+        if (LoginTimeoutTask::isEnabled()) {
+            LoginTimeoutTask::getInstance()->removePlayer($player);
+        }
     }
 
     /**
@@ -63,8 +73,12 @@ final class LoginListener implements Listener
      */
     public function onLogout(PlayerLoggedOutEvent $event)
     {
-        if (!Loader::getInstance()->allowNotLoggedInPlayerMove()) {
+        if (!Loader::getInstance()->allowNotLoggedInPlayerMove() && !$event->wasDisconnected()) {
             SystemUtils::freezePlayer($event->getPlayer(), true);
+        }
+
+        if (LoginTimeoutTask::isEnabled() && !$event->wasDisconnected()) {
+            LoginTimeoutTask::getInstance()->addPlayer($event->getPlayer());
         }
     }
 

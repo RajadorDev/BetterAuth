@@ -47,4 +47,9 @@ hide-password:
   # Porcentagem de caracteres que serão exibidos:
   chars-percent: 20.0
 
+# Tempo maximo para que o jogador registre/logue no servidor (se zerado desativa o tempo maximo) em segundos
+max-auth-time: 25
+
+# Quantidade maxima de login que uma pessoa pode tentar
+max-login-attempts: 5
 ...

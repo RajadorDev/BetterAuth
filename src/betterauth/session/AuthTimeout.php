@@ -21,30 +21,51 @@ declare (strict_types=1);
  * 
 **/ 
 
-namespace betterauth\event;
+namespace betterauth\session;
 
-use betterauth\provider\Account;
-use pocketmine\event\player\PlayerEvent;
+use betterauth\Loader;
+use betterauth\session\task\LoginTimeoutTask;
 use pocketmine\Player;
 
-abstract class PlayerAccountEvent extends PlayerEvent
+class AuthTimeout
 {
 
-    /** @var Account */
-    protected $account;
+    /** @var Player */
+    protected $player;
+
+    /** @var integer */
+    protected $maxTimeTicks;
+
+    /** @var integer */
+    protected $currentLoggedOutTicks = 0;
 
     public function __construct(
         Player $player,
-        Account $account
+        int $maxTimeTicks
     )
     {
         $this->player = $player;
-        $this->account = $account;
+        $this->maxTimeTicks = $maxTimeTicks;
     }
 
-    public function getAccount() : Account
+    public function getPlayer() : Player 
     {
-        return $this->account;
+        return $this->player;
     }
+
+    public function tick()
+    {
+        $this->currentLoggedOutTicks++;
+        if ($this->currentLoggedOutTicks >= $this->maxTimeTicks) {
+            $this->destroy();
+            $this->getPlayer()->close('', Loader::getInstance()->getMessages()->get('login-timeout-screen', null, null, '', false));
+        }
+    }
+
+    public function destroy()
+    {
+        LoginTimeoutTask::getInstance()->removePlayer($this->player);
+    }
+
 
 }

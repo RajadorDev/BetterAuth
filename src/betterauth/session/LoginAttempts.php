@@ -21,30 +21,46 @@ declare (strict_types=1);
  * 
 **/ 
 
-namespace betterauth\event;
+namespace betterauth\session;
 
-use betterauth\provider\Account;
-use pocketmine\event\player\PlayerEvent;
+use betterauth\Loader;
 use pocketmine\Player;
 
-abstract class PlayerAccountEvent extends PlayerEvent
+class LoginAttempts 
 {
 
-    /** @var Account */
-    protected $account;
+    /** @var array<string,int> */
+    protected static $maxLoginAttempts = [];
 
-    public function __construct(
-        Player $player,
-        Account $account
-    )
+    public static function hashPlayer(Player $player) : string 
     {
-        $this->player = $player;
-        $this->account = $account;
+        return self::hash($player->getName(), $player->getAddress());
     }
 
-    public function getAccount() : Account
+    public static function hash(string $username, string $address) : string 
     {
-        return $this->account;
+        $username = strtolower($username);
+        return "$username:$address";
     }
 
+    /**
+     * @param Player $player
+     * @return boolean True if the player can do more attempts. But if false, it means that the player was kicked
+     */
+    public static function addAttempt(Player $player) : bool
+    {
+        if (!isset(self::$maxLoginAttempts[$loaderId = $player->getLoaderId()])) {
+            self::$maxLoginAttempts[$loaderId] = 0;
+        }
+
+        self::$maxLoginAttempts[$loaderId] += 1;
+        
+        if (self::$maxLoginAttempts[$loaderId] >= Loader::getInstance()->getSettings()->getMaxLoginAttempts()) {
+            unset(self::$maxLoginAttempts[$loaderId]);
+            $message = Loader::getInstance()->getMessages()->get('screen-max-attempts', null, null, '', false);
+            $player->close('', $message);
+            return false;
+        }
+        return true;
+    }
 }

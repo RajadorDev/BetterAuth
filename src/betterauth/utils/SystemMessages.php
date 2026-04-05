@@ -63,9 +63,10 @@ class SystemMessages
      * @param string|string[]|null $replace
      * @param string|string[]|null $to
      * @param string $defaultMessage
+     * @param boolean $usePrefix 
      * @return string
      */
-    public function get(string $identifier, $replace = null, $to = null, string $defaultMessage = 'Message not found') : string
+    public function get(string $identifier, $replace = null, $to = null, string $defaultMessage = 'Message not found', bool $usePrefix = true) : string
     {
         if (is_string($message = $this->file->get($identifier, null))) {
             if ($replace !== null) {
@@ -75,7 +76,7 @@ class SystemMessages
             Loader::getInstance()->getLogger()->warning("Message $identifier does not found");
         }
 
-        return $message ?? $defaultMessage;
+        return ($usePrefix ? Loader::getInstance()->getSettings()->getPrefix() : '') . ($message ?? $defaultMessage);
     }
 
     /**
