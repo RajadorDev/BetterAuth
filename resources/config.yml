@@ -52,4 +52,7 @@ max-auth-time: 25
 
 # Quantidade maxima de login que uma pessoa pode tentar
 max-login-attempts: 5
+
+# Teleportar o jogador para o lobby quando entrar (esta opção só funcionará se a opção logged-out-room estiver desativada ou não ser inicializada corretamente)
+join-player-teleport: true
 ...

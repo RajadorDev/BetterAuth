@@ -25,28 +25,30 @@ namespace betterauth\commands;
 
 use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
-use betterauth\event\PlayerRegisterEvent;
+use betterauth\event\PlayerChangePasswordEvent;
 use betterauth\Loader;
-use betterauth\provider\exception\AccountAlreadyRegisteredException;
+use betterauth\provider\exception\AccountNotFoundException;
+use betterauth\provider\exception\WrongPasswordException;
 use betterauth\session\SessionController;
 use betterauth\utils\SystemUtils;
 use Exception;
 use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
+use SmartCommand\command\rule\defaults\CooldownRule;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
 use SmartCommand\message\CommandMessages;
 use SmartCommand\utils\MemberPermissionTrait;
 
-class RegisterCommand extends SmartCommand
+class ChangePasswordCommand extends SmartCommand
 {
     public function __construct(CommandMessages $commandMessages)
     {
         return parent::__construct(
-            'register',
-            'register in ther server',
+            'changepassword',
+            'change your password',
             self::DEFAULT_USAGE_PREFIX,
-            ['registrar'],
+            ['changepass'],
             $commandMessages
         );
     }
@@ -56,26 +58,20 @@ class RegisterCommand extends SmartCommand
     protected function prepare()
     {
         $this->registerArgument(0, new PasswordArgument('password', true));
-        $this->registerArgument(1, new PasswordArgument('password-confirm', Loader::getInstance()->getSettings()->needToConfirmPassword()));
-        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
+        $this->registerArgument(1, new PasswordArgument('password-confirm', true));
+        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule(), new CooldownRule(5, true));
     }
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
-        if (!is_null(SessionController::getInstance()->getPlayerSession($sender))) {
-            return;
-        }
+        SystemUtils::callEvent(new PlayerChangePasswordEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
         $password = $args->getValue('password');
-        if ($args->has('password-confirm')) {
-            $passwordConfirm = $args->getValue('password-confirm');
-            if ($password !== $passwordConfirm) {
-                $sender->sendMessage(Loader::getInstance()->getMessages()->get('passwords-dont-match'));
-                return;
-            }
-        }
-        Loader::getInstance()->getProvider()->tryRegister(
-            $sender,
-            $password
+        $passwordConfirm = $args->getValue('password-confirm');
+        $name = $sender->getName();
+        Loader::getInstance()->getProvider()->changePassword(
+            $name,
+            $password,
+            $passwordConfirm
         )->then(
                 function ($result) use ($password, $sender) {
                     if (!SystemUtils::isValidPlayer($sender)) {
@@ -85,19 +81,20 @@ class RegisterCommand extends SmartCommand
                         if ($result instanceof Exception) {
                             throw $result;
                         }
-                        SystemUtils::callEvent(new PlayerRegisterEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
                         $settings = Loader::getInstance()->getSettings();
                         $passwordToShow = $password;
                         if ($settings->isHidePasswordEnabled()) {
                             $percent = $settings->getShowPasswordPercent();
                             $passwordToShow = SystemUtils::hideChars($password, $percent);
                         }
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-registered', '{password}', $passwordToShow));
-                    } catch (AccountAlreadyRegisteredException $error) {
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-alredy-registered'));
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('change-password-successfully', '{password}', $passwordToShow));
+                    } catch (WrongPasswordException $error) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('wrong-password-confirm'));
+                    } catch (AccountNotFoundException $error) {
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-not-found'));
                     }
                 }
-            )->then(
+            )->catch(
                 function () use ($sender) {
                     if (SystemUtils::isValidPlayer($sender)) {
                         $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));

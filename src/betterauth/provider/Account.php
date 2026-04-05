@@ -135,6 +135,11 @@ class Account extends PlayerPropertyDynamicObject
         return ($this->address === $player->getAddress() && $this->clientId === $player->getClientId());
     }
 
+    public function updateLastLogin() 
+    {
+        $this->lastLoginAt = microtime(true);
+    }
+
     /**
      * @param string $rawCheckPassword
      * @param string $newPasswordRaw
