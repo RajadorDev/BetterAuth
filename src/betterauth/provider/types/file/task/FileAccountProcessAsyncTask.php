@@ -42,12 +42,12 @@ abstract class FileAccountProcessAsyncTask extends AsyncPromiseTask
      * @param array{file_path:string} $safeVarValues
      * @return mixed
      */
-    protected function processAndResult(array $safeVarValues)
+    protected function processAndSerializeResult(array $safeVarValues)
     {
         $filePath = $safeVarValues['file_path'];
 
         if (!file_exists($filePath)) {
-            return new AccountNotFoundException("Account $filePath does not exists");
+            return serialize(new AccountNotFoundException("Account $filePath does not exists"));
         }
 
         $fileData = file_get_contents($filePath);

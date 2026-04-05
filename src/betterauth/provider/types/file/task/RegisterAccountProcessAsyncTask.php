@@ -43,19 +43,21 @@ class RegisterAccountProcessAsyncTask extends AsyncPromiseTask
         );
     }
 
-    protected function processAndResult(array $safeVarValues)
+    protected function processAndSerializeResult(array $safeVarValues)
     {
         $path = $safeVarValues['file_path'];
 
         if (file_exists($path)) {
-            return new AccountAlreadyRegisteredException("Account {$path} does not found");
+            return serialize(new AccountAlreadyRegisteredException("Account {$path} does not found"));
         }
 
         $accountData = $safeVarValues['account'];
 
         $account = DynamicObject::globalUnserialize($accountData);
 
-        return $account;
+        return serialize(
+            $account->jsonSerialize()
+        );
     }
 
 }
