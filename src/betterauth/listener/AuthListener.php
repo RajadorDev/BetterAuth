@@ -20,6 +20,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
@@ -88,6 +89,7 @@ final class AuthListener implements Listener
         }
     }
 
+    
     public function onPreLogin(PlayerPreLoginEvent $event)
     {
         $playerName = $event->getPlayer()->getName();
@@ -100,7 +102,7 @@ final class AuthListener implements Listener
         }
     }
 
-    public function onLogin(PlayerLoginEvent $event)
+    public function onJoin(PlayerJoinEvent $event)
     {
         $player = $event->getPlayer();
 
