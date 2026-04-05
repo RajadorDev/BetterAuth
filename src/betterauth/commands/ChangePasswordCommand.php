@@ -26,11 +26,15 @@ namespace betterauth\commands;
 use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
 use betterauth\Loader;
+use betterauth\provider\exception\AccountNotFoundException;
+use betterauth\provider\exception\WrongPasswordException;
+use betterauth\utils\SystemUtils;
+use Exception;
 use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
+use SmartCommand\command\rule\defaults\CooldownRule;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
-use SmartCommand\message\CommandMessages;
 use SmartCommand\utils\MemberPermissionTrait;
 
 class ChangePasswordCommand extends SmartCommand
@@ -40,7 +44,7 @@ class ChangePasswordCommand extends SmartCommand
         return parent::__construct(
             'changepassword',
             'change your password',
-            '/changepassword <new - password> <confirm - password>',
+            self::DEFAULT_USAGE_PREFIX,
             ['changepass'],
             $messages = null
         );
@@ -52,19 +56,41 @@ class ChangePasswordCommand extends SmartCommand
     {
         $this->registerArgument(0, new PasswordArgument('password', true));
         $this->registerArgument(1, new PasswordArgument('password-confirm', true));
-        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
+        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule(), new CooldownRule(5, true));
     }
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
         $password = $args->getValue('password');
         $passwordConfirm = $args->getValue('password-confirm');
-        if ($passwordConfirm === $password) {
-            //TODO: adicionar funcao de trocar senha
-            $sender->sendMessage(Loader::getInstance()->getMessages()->get('password-changed', '{password}', $password));
-            return;
-        }
-        $sender->sendMessage(Loader::getInstance()->getMessages()->get('passwords-dont-match'));
-        return;
+        $name = $sender->getName();
+        Loader::getInstance()->getProvider()->changePassword(
+            $name,
+            $password,
+            $passwordConfirm
+        )->then(
+            function ($result) use ($passwordConfirm, $sender) {
+                if (!SystemUtils::isValidPlayer($sender)) {
+                    return;
+                }
+                try {
+                    if ($result instanceof Exception) {
+                        throw $result;
+                    }
+                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('change-password-successfully', '{senha}', $passwordConfirm));
+
+                } catch (WrongPasswordException $error) {
+                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('wrong-password-confirm'));
+                } catch (AccountNotFoundException $error) {
+                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-not-found'));
+                }
+            }
+        )->catch(
+            function () use ($sender) {
+                if(SystemUtils::isValidPlayer($sender)) {
+                    $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+                }
+            }
+        );
     }
 }

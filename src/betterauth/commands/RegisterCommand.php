@@ -36,7 +36,6 @@ use SmartCommand\utils\MemberPermissionTrait;
 
 class RegisterCommand extends SmartCommand
 {
-    use MemberPermissionTrait;
     public function __construct()
     {
         return parent::__construct(
@@ -47,6 +46,8 @@ class RegisterCommand extends SmartCommand
             $messages = null
         );
     }
+
+    use MemberPermissionTrait;
 
     protected function prepare()
     {

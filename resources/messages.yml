@@ -8,3 +8,5 @@ login-sucessfully: "Você foi logado com §a§lSucesso§r§7!"
 change-password: "voce trocou a sua senha nova senha: "
 generic-error: "Ocorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
 already-logged-in: '§cVocê já está logado!'
+change-password-successfully: "Voce trocou sua senha, nova senha: {senha}"
+wrong-password-confirm: "A sua senha atual está incorreta"
