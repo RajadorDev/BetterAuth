@@ -21,37 +21,40 @@ declare(strict_types=1);
  * 
  **/
 
-namespace betterauth\commands\arguments;
+namespace betterauth\commands;
 
+use betterauth\command\rule\NotLoggedInCommandRule;
 use betterauth\Loader;
-use pocketmine\utils\TextFormat;
-use SmartCommand\command\argument\BaseArgument;
+use betterauth\session\SessionController;
+use pocketmine\command\CommandSender;
+use SmartCommand\command\CommandArguments;
+use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
+use SmartCommand\command\SmartCommand;
 use SmartCommand\message\CommandMessages;
+use SmartCommand\utils\MemberPermissionTrait;
 
-class PasswordArgument extends BaseArgument
+class LogoutCommand extends SmartCommand
 {
-    public function __construct(string $name, bool $required)
+    use MemberPermissionTrait;
+    public function __construct(CommandMessages $commandMessages)
     {
         return parent::__construct(
-            $name,
-            'string',
-            $required,
-            function (&$given) {
-                if (strlen($given) > Loader::getInstance()->getSettings()->getMaxPasswordLength()) {
-                    return false;
-                }
-                if (strlen($given) < Loader::getInstance()->getSettings()->getMinPasswordLength()) {
-                    return false;
-                }
-            }
+            'logout',
+            'logout of ther server',
+            self::DEFAULT_USAGE_PREFIX,
+            [],
+            $commandMessages
         );
     }
 
-    public function getWrongMessage(CommandMessages $commandMessages, string $argumentUsed): string
+    protected function prepare()
     {
-        $maxChar = Loader::getInstance()->getSettings()->getMaxPasswordLength();
-        $minChar = Loader::getInstance()->getSettings()->getMinPasswordLength();
-        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::RED . "Sua senha precisa ter no mínimo $minChar caracteres e no máximo $maxChar caracteres!");
-        return parent::getWrongMessage($commandMessages, $argumentUsed);
+        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
+    }
+
+    protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
+    {
+        SessionController::getInstance()->getPlayerSession($sender)->destroy(false);
+        $sender->sendMessage(Loader::getInstance()->getMessages()->get('logout'));
     }
 }

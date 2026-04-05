@@ -1,7 +1,7 @@
 <?php
 
-declare (strict_types=1);
- 
+declare(strict_types=1);
+
 /***
  * 
  * ██████╗ ███████╗████████╗████████╗███████╗██████╗      █████╗ ██╗   ██╗████████╗██╗  ██╗
@@ -19,10 +19,12 @@ declare (strict_types=1);
  * 
  * NATANBX0: https://github.com/NATANBX0
  * 
-**/
+ **/
 
 namespace betterauth;
 
+use betterauth\commands\ChangePasswordCommand;
+use betterauth\commands\LogoutCommand;
 use betterauth\utils\Settings;
 use Betterauth\Commands\LoginCommand;
 use Betterauth\Commands\RegisterCommand;
@@ -48,7 +50,7 @@ use SmartCommand\message\DefaultMessages;
 
 class Loader extends PluginBase
 {
- 
+
     use SingletonTrait;
 
     /** @var SystemMessages */
@@ -73,13 +75,12 @@ class Loader extends PluginBase
 
     public function onEnable()
     {
-        if (!file_exists($dir = $this->getDataFolder()))
-        {
+        if (!file_exists($dir = $this->getDataFolder())) {
             mkdir($dir);
         }
 
         $this->saveResource('config.yml');
-        
+
         $this->saveResource('messages.yml');
         $messagesFilePath = $dir . 'messages.yml';
 
@@ -146,17 +147,17 @@ class Loader extends PluginBase
         $this->provider = $provider;
     }
 
-    public function getMessages() : SystemMessages
+    public function getMessages(): SystemMessages
     {
         return $this->messages;
     }
 
-    public function getSettings() : Settings
+    public function getSettings(): Settings
     {
         return $this->settings;
     }
 
-    public function getProvider() : AccountProvider
+    public function getProvider(): AccountProvider
     {
         return $this->provider;
     }
@@ -184,7 +185,9 @@ class Loader extends PluginBase
         foreach (
             [
                 new LoginCommand($messages),
-                new RegisterCommand($messages)
+                new RegisterCommand($messages),
+                new LogoutCommand($messages),
+                new ChangePasswordCommand($messages)
             ] as $authCommand
         ) {
             $this->allowedNotLoggedInCommands[$authCommand->getName()] = $authCommand;
@@ -224,5 +227,5 @@ class Loader extends PluginBase
             $this->registerListener($listener);
         }
     }
-    
+
 }
