@@ -23,6 +23,7 @@ declare (strict_types=1);
 
 namespace betterauth\utils\async;
 
+use betterauth\utils\DynamicObject;
 use pocketmine\Server;
 use Throwable;
 use betterauth\utils\promise\Promise;
@@ -101,22 +102,10 @@ abstract class AsyncPromiseTask extends RealAsyncTask
         return $this->getResolver()->getPromise();
     }
 
-    public function onRun()
-    {
-        try {
-            $result = static::processAndResult();
-            $this->setResult($result);
-        } catch (Throwable $error) {
-            $this->setResult(json_encode([
-                self::INDEX_ERROR_RESULT => (string) $error
-            ]));
-        }
-    }
-
     public function onRun() 
     {
         try {
-            $result = $this->processAndResult(unserialize($this->threadSafeValues));
+            $result = $this->processAndSerializeResult(unserialize($this->threadSafeValues));
             $this->setResult($result);
         } catch (Throwable $error) {
             $this->error = (string) $error;
@@ -127,7 +116,7 @@ abstract class AsyncPromiseTask extends RealAsyncTask
      * @param array<string,string|int|bool|float|null|array> $safeVarValues
      * @return mixed
      */
-    abstract protected function processAndResult(array $safeVarValues);
+    abstract protected function processAndSerializeResult(array $safeVarValues);
 
     public function onCompletion(Server $server)
     {
@@ -137,7 +126,15 @@ abstract class AsyncPromiseTask extends RealAsyncTask
             return;
         }
 
-        $resolver->resolve($this->getResult());
+        $result = unserialize($this->getResult());
+
+        if (is_array($result) && isset($result[DynamicObject::SOURCE_ID])) {
+            $result = DynamicObject::globalUnserialize($result);
+        }
+
+        $resolver->resolve(
+            $result
+        );
     }
 
 }

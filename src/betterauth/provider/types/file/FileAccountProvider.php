@@ -26,6 +26,8 @@ namespace betterauth\provider\types\file;
 use betterauth\provider\Account;
 use betterauth\provider\AccountProvider;
 use betterauth\provider\exception\AccountAlreadyRegisteredException;
+use betterauth\provider\exception\AccountNotFoundException;
+use betterauth\provider\types\file\task\ChangePasswordAsyncTask;
 use betterauth\provider\types\file\task\GetAccountFileAsyncTask;
 use betterauth\provider\types\file\task\LoginAccountProcessAsyncTask;
 use betterauth\provider\types\file\task\RegisterAccountProcessAsyncTask;
@@ -115,6 +117,23 @@ class FileAccountProvider implements AccountProvider
         $path = $this->getPlayerFilePath($username);
 
         $task = new UpdateAccountProcessAsyncTask($path, $account);
+        $task::schedule($task);
+        return $task->getPromise();
+    }
+
+    public function changePassword(string $playerName, string $rawCheckPassword, string $newPasswordRaw): Promise
+    {
+        if ($this->syncIsRegistered($playerName)) {
+            $resolver = new PromiseResolver;
+            $resolver->resolve(new AccountNotFoundException("Account $playerName does not found"));
+            return $resolver->getPromise();
+        }
+
+        $task = new ChangePasswordAsyncTask(
+            $this->getPlayerFilePath($playerName),
+            $rawCheckPassword,
+            $newPasswordRaw
+        );
         $task::schedule($task);
         return $task->getPromise();
     }
