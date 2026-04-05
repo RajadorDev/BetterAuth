@@ -40,6 +40,7 @@ class LogoutCommand extends SmartCommand
         return parent::__construct(
             'logout',
             'logout of ther server',
+            self::DEFAULT_USAGE_PREFIX,
             '/logout',
             [],
             $messages = null

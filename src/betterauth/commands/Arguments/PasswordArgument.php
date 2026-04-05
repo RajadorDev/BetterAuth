@@ -21,7 +21,7 @@ declare(strict_types=1);
  * 
  **/
 
-namespace Betterauth\Commands\Arguments;
+namespace betterauth\commands\arguments;
 
 use betterauth\Loader;
 use pocketmine\utils\TextFormat;

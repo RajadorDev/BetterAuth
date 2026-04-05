@@ -42,7 +42,7 @@ class RegisterCommand extends SmartCommand
         return parent::__construct(
             'register',
             'register in ther server',
-            '/register <password>',
+            self::DEFAULT_USAGE_PREFIX,
             ['registrar'],
             $messages = null
         );

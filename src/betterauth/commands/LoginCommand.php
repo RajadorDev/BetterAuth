@@ -46,7 +46,7 @@ class LoginCommand extends SmartCommand
         return parent::__construct(
             'login',
             'Log-in the server',
-            '/login <password>',
+            self::DEFAULT_USAGE_PREFIX,
             ['logar'],
             $messages = null
         );
