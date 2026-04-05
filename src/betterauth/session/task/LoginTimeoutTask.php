@@ -56,10 +56,12 @@ class LoginTimeoutTask extends PluginTask
     )
     {
         Server::getInstance()->getScheduler()->scheduleRepeatingTask(
-            new self(Loader::getInstance(), $maxTimeTicks),
+            $instance = new self(Loader::getInstance(), $maxTimeTicks),
             1
         );
         self::$enabled = true;
+
+        self::setInstance($instance);
     }
 
     public function __construct(
