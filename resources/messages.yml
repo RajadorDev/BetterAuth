@@ -2,4 +2,5 @@
 generic-error: "Ocorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
 login-sucessfully: "Você foi logado com §a§lSucesso§r§7!"
 auto-login-sucessfully: "Você foi logado automaticamente!"
+already-logged-in: '§cVocê já está logado!'
 ...
