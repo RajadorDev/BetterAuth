@@ -61,3 +61,37 @@ Loader::getInstance()->getProvider()->getAccount($player->getName())
         }
     }
 );
+
+
+Loader::getInstance()->getProvider()->changePassword(
+    $player->getName(),
+    'natansenha1234', // Senha de confirmação
+    'natan12345678' // Senha nova
+)->then(
+    function ($result) use ($player) {
+
+        if (SystemUtils::isValidPlayer($player)) {
+            return;
+        }
+
+        try {
+
+            if ($result instanceof Exception) {
+                throw $result;
+            }
+
+            // Deu certo pode falar oque quiser pra ele e $result é um objeto Account
+
+        } catch (WrongPasswordException $error) {
+            // Senha errada
+        } catch (AccountNotFoundException $error) {
+            // A conta nem está registrada
+        }
+    }
+)->catch(
+    function () use ($player) {
+        if (SystemUtils::isValidPlayer($player)) {
+            $player->sendMessage('Houve um problema desconhecido');
+        }
+    }
+);

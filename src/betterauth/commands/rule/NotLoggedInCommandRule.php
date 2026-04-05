@@ -46,8 +46,7 @@ class NotLoggedInCommandRule implements CommandSenderRule
 
     public function getMessage($command, CommandSender $sender): string
     {
-        //TODO: Adicionar a mensagem pelo comando pegando de uma config
-        return $command->getMessages()->get('not-logged-in');
+        return $command->getMessages()->get('already-logged-in');
     }
 
 }

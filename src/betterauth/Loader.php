@@ -23,10 +23,13 @@ declare(strict_types=1);
 
 namespace betterauth;
 
+use betterauth\commands\ChangePasswordCommand;
 use betterauth\commands\LogoutCommand;
 use betterauth\utils\Settings;
 use Betterauth\Commands\LoginCommand;
 use Betterauth\Commands\RegisterCommand;
+use betterauth\listener\AuthListener;
+use betterauth\listener\LoginListener;
 use betterauth\provider\AccountProvider;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
@@ -34,7 +37,8 @@ use pocketmine\Server;
 use SmartCommand\utils\SingletonTrait;
 use betterauth\utils\SystemMessages;
 use betterauth\provider\types\file\FileAccountProvider;
-use betterauth\commands\ChangePasswordCommand;
+use betterauth\room\LoggedOutRoom;
+use betterauth\session\SessionController;
 use SmartCommand\command\SmartCommand;
 
 class Loader extends PluginBase
@@ -50,6 +54,9 @@ class Loader extends PluginBase
 
     /** @var AccountProvider */
     protected $provider;
+
+    /** @var LoggedOutRoom|null */
+    protected $loggedOutRoom = null;
 
     public function onLoad()
     {
@@ -74,6 +81,13 @@ class Loader extends PluginBase
         $accountsFolder = $dir . 'accounts' . DIRECTORY_SEPARATOR;
         $fileProvider = new FileAccountProvider($accountsFolder);
         $this->setProvider($fileProvider);
+
+        $this->loggedOutRoom = LoggedOutRoom::createFromSettings($this->settings, $this);
+
+        SessionController::init();
+
+        $this->initListeners();
+
         $this->registerCommands();
     }
 
@@ -97,22 +111,38 @@ class Loader extends PluginBase
         return $this->provider;
     }
 
+    public function getLoggedOutRoom()
+    {
+        return $this->loggedOutRoom;
+    }
+
     public function registerListener(Listener $listener)
     {
         Server::getInstance()->getPluginManager()->registerEvents($listener, $this);
     }
 
-    public function registerCommands()
+    protected function registerCommands()
     {
         $cm = $this->getServer()->getCommandMap();
         $cm->register('register', new RegisterCommand());
         $cm->register('login', new LoginCommand());
-        $cm->register('changepassword', new ChangePasswordCommand);
+        $cm->register('changepassword', new ChangePasswordCommand());
         $cm->register('logout', new LogoutCommand());
     }
 
-    public function pushMessagesToCommand(SmartCommand $command)
+    protected function pushMessagesToCommand(SmartCommand $command)
     {
         $command->getMessages()->add($this->messages->getFile()->getAll());
     }
+
+    protected function initListeners()
+    {
+        foreach ([
+            new LoginListener($this->settings, $this->messages),
+            new AuthListener(SessionController::getInstance())
+        ] as $listener) {
+            $this->registerListener($listener);
+        }
+    }
+
 }

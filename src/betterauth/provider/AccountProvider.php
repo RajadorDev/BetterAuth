@@ -67,4 +67,12 @@ interface AccountProvider
      */
     public function updateAccount(Account $account) : Promise;
 
+    /**
+     * @param string $playerName
+     * @param string $rawCheckPassword Password used to check if the player can really change
+     * @param string $newPasswordRaw
+     * @return Promise<WrongPasswordException|AccountNotFoundException|Account>
+     */
+    public function changePassword(string $playerName, string $rawCheckPassword, string $newPasswordRaw) : Promise;
+
 }

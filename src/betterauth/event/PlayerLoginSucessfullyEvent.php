@@ -21,64 +21,41 @@ declare (strict_types=1);
  * 
 **/ 
 
-namespace betterauth\session;
+namespace betterauth\event;
 
-use betterauth\provider\Account;
+use betterauth\session\Session;
+use pocketmine\event\player\PlayerEvent;
 use pocketmine\Player;
 
-class Session
+class PlayerLoginSucessfullyEvent extends PlayerEvent
 {
 
-    /** @var Player */
-    protected $player;
+    public static $handlerList = null;
 
-    /** @var Account */
-    protected $account;
+    /** @var Session */
+    protected $session;
 
     /** @var boolean */
-    protected $loggedInAutomatically;
-
-    /**
-     * @param Player $player
-     * @param Account $account
-     * @param boolean $loggedInAutomatically
-     * @return Session
-     */
-    public static function create(Player $player, Account $account, bool $loggedInAutomatically) : Session
-    {
-        return new self($player, $account, $loggedInAutomatically);
-    }
+    protected $wasLoggedInAutomatically;
 
     public function __construct(
         Player $player,
-        Account $account,
-        bool $loggedInAutomatically
+        Session $session,
+        bool $wasLoggedInAutomatically
     )
     {
-        $this->account = $account;
         $this->player = $player;
-        $this->loggedInAutomatically = $loggedInAutomatically;
+        $this->session = $session;
+        $this->wasLoggedInAutomatically = $wasLoggedInAutomatically;
     }
 
-    public function getPlayer() : Player
+    public function getSession() : Session
     {
-        return $this->player;
-    }
-
-    public function getAccount() : Account
-    {
-        return $this->account;
+        return $this->session;
     }
 
     public function wasLoggedInAutomatically() : bool 
     {
-        return $this->loggedInAutomatically;
+        return $this->wasLoggedInAutomatically;
     }
-
-    public function destroy()
-    {
-        SessionController::getInstance()->logout($this);
-    }
-
-
 }

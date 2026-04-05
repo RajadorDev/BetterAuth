@@ -23,6 +23,7 @@ declare (strict_types=1);
 
 namespace betterauth\provider;
 
+use betterauth\provider\exception\WrongPasswordException;
 use betterauth\utils\DynamicObject;
 use betterauth\utils\PlayerPropertyDynamicObject;
 use pocketmine\Player;
@@ -127,6 +128,26 @@ class Account extends PlayerPropertyDynamicObject
     public function matchPlayerAddress(Player $player) : bool 
     {
         return $this->address === $player->getAddress();
+    }
+
+    public function matchAutoLogin(Player $player) : bool 
+    {
+        return ($this->address === $player->getAddress() && $this->clientId === $player->getClientId());
+    }
+
+    /**
+     * @param string $rawCheckPassword
+     * @param string $newPasswordRaw
+     * @return true
+     * @throws WrongPasswordException
+     */
+    public function tryChangePassword(string $rawCheckPassword, string $newPasswordRaw)
+    {
+        if ($this->matchPassword($rawCheckPassword)) {
+            $this->passwordEncrypted = static::encryptPassword($newPasswordRaw);
+            return;
+        }
+        throw new WrongPasswordException('');
     }
 
     public function save(string $path)
