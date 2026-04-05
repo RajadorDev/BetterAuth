@@ -29,6 +29,7 @@ use betterauth\Loader;
 use betterauth\provider\exception\AccountNotFoundException;
 use betterauth\provider\exception\WrongPasswordException;
 use betterauth\session\exception\SessionAlreadyLoggedInException;
+use betterauth\session\LoginAttempts;
 use betterauth\session\SessionController;
 use betterauth\utils\SystemUtils;
 use Exception;
@@ -63,7 +64,10 @@ class LoginCommand extends SmartCommand
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
         $password = $args->getValue('password');
-        Loader::getInstance()->getProvider()->tryLogin($sender, $password)->then(
+        Loader::getInstance()->getProvider()->tryLogin(
+            $sender, 
+            $password
+        )->then(
             function ($result) use ($sender, $password) {
                 if (!SystemUtils::isValidPlayer($sender)) {
                     return;
@@ -76,21 +80,24 @@ class LoginCommand extends SmartCommand
                     try {
                         SessionController::getInstance()->acceptLogin($sender, $result, false);
                     } catch (SessionAlreadyLoggedInException $error) {
-                        $sender->close('', 'Já tem alguém logado com seu nome');
+                        $sender->close('', Loader::getInstance()->getMessages()->get('account-in-use'));
                     }
                 } catch (AccountNotFoundException $error) {
                     $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-fot-found'));
                 } catch (WrongPasswordException $error) {
-                    $sender->sendMessage((Loader::getInstance()->getMessages()->get('wrong-password')));
+                    if (LoginAttempts::addAttempt($sender)) {
+                        $sender->sendMessage((Loader::getInstance()->getMessages()->get('wrong-password')));
+                    }
+                }
+            }
+        )->catch(
+            function () use ($sender) {
+                if (SystemUtils::isValidPlayer($sender)) {
+                    return;
                 }
 
+                $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
             }
-        )->catch(function () use ($sender) {
-            if (SystemUtils::isValidPlayer($sender)) {
-                return;
-            }
-
-            $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
-        });
+        );
     }
 }
