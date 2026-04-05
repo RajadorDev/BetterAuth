@@ -37,7 +37,7 @@ class PasswordArgument extends BaseArgument
             'string',
             $required,
             function (&$given) {
-                if (strlen($given) < Loader::getInstance()->getSettings()->getMaxPasswordLength()) {
+                if (strlen($given) > Loader::getInstance()->getSettings()->getMaxPasswordLength()) {
                     return false;
                 }
                 if (strlen($given) < Loader::getInstance()->getSettings()->getMinPasswordLength()) {
@@ -49,7 +49,9 @@ class PasswordArgument extends BaseArgument
 
     public function getWrongMessage(CommandMessages $commandMessages, string $argumentUsed): string
     {
-        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::GRAY . 'Sua senha precisa ter no mínimo ' . TextFormat::RED . ' 8 ' . TextFormat::GRAY . 'caracteres!');
+        $maxChar = Loader::getInstance()->getSettings()->getMaxPasswordLength();
+        $minChar = Loader::getInstance()->getSettings()->getMinPasswordLength();
+        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::RED . "Sua senha precisa ter no mínimo $minChar caracteres e no máximo $maxChar caracteres!");
         return parent::getWrongMessage($commandMessages, $argumentUsed);
     }
 }

@@ -27,7 +27,6 @@ use betterauth\command\rule\NotLoggedInCommandRule;
 use Betterauth\Commands\Arguments\PasswordArgument;
 use betterauth\event\PlayerRegisterEvent;
 use betterauth\Loader;
-use betterauth\provider\Account;
 use betterauth\provider\exception\AccountAlreadyRegisteredException;
 use betterauth\session\SessionController;
 use betterauth\utils\SystemUtils;

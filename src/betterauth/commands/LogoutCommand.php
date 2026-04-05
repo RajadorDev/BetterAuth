@@ -54,7 +54,7 @@ class LogoutCommand extends SmartCommand
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
-        SessionController::getInstance()->getPlayerSession($sender)->destroy();
+        SessionController::getInstance()->getPlayerSession($sender)->destroy(false);
         $sender->sendMessage(Loader::getInstance()->getMessages()->get('logout'));
     }
 }
