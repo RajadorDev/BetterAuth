@@ -40,7 +40,9 @@ use betterauth\provider\types\file\FileAccountProvider;
 use betterauth\room\LoggedOutRoom;
 use betterauth\session\SessionController;
 use betterauth\session\task\LoginTimeoutTask;
+use betterauth\utils\SystemUtils;
 use pocketmine\command\Command;
+use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use rajadordev\autoupdater\api\CheckUpdateScheduler;
 use rajadordev\autoupdater\api\plugin\defaults\github\GitHubPluginUpdaterAPI;
@@ -216,6 +218,38 @@ class Loader extends PluginBase
             return $this->loggedOutRoom->canMove();
         }
         return false;
+    }
+
+    public function onPlayerJoin(Player $player)
+    {
+        if (!$this->allowNotLoggedInPlayerMove()) {
+            SystemUtils::freezePlayer($player, true);
+        }
+        
+        if (!$this->getSettings()->isAutoLoginEnabled()) {
+            $this->teleportWhenJoin($player);
+        }
+
+        $message = $this->messages->get(
+            'join-message',
+            [
+                '{username}',
+                '{server_port}'
+            ],
+            [
+                $player->getName(),
+                $player->getServer()->getPort()
+            ],
+            '',
+            false
+        );
+
+        $player->sendMessage($message);
+    }
+
+    public function teleportWhenJoin(Player $player)
+    {
+        
     }
 
     protected function initListeners() 

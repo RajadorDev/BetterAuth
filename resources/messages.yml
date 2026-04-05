@@ -11,11 +11,12 @@ already-logged-in: '§cVocê já está logado!'
 change-password-successfully: "Você trocou sua senha, nova senha: {password}"
 wrong-password-confirm: "§cA sua senha atual está incorreta"
 interation-not-logged: "§7Você precisa logar para interagir ou se mover"
-screen-cant-join: "§fJá existe uma sessão com o username §e\"{player_name}\""
 not-logged-in-command: '§cVocê precisa logar para executar outros comandos!'
 account-alredy-registered: '§fSua conta já está registrada'
 logout: "§fVocê foi deslogado da sua conta"
 login-timeout-screen: '§cVocê demorou muito para se autenticar!'
 screen-max-attempts: '§cVocê tentou logar muitas vezes'
 session-already-created: "§cJá há um usuario logado na conta §f{username}§c!"
+password-length: "§cSua senha precisa ter no mínimo §f{min_char} §ccaracteres e no máximo §f{max_char} §ccaracteres!"
+join-message: "§8----====(§aBetter§bAuth§8)====----\n§8-\n§8-§7  Bem vindo ao servidor §f{username}§7!\n§8-\n§8-  §7IP: 0.0.0.0\n§8-  §7Porta: §f{server_port}\n§8-  \n§8- Autenticação protegida e criptografada pelo §aBetter§bAuth§7!\n§8- "
 ...

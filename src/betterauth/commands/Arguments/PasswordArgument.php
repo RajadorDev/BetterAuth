@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace betterauth\commands\arguments;
 
 use betterauth\Loader;
-use pocketmine\utils\TextFormat;
 use SmartCommand\command\argument\BaseArgument;
 use SmartCommand\message\CommandMessages;
 
@@ -51,7 +50,13 @@ class PasswordArgument extends BaseArgument
     {
         $maxChar = Loader::getInstance()->getSettings()->getMaxPasswordLength();
         $minChar = Loader::getInstance()->getSettings()->getMinPasswordLength();
-        $commandMessages->set(CommandMessages::INVALID_ARGUMENT, TextFormat::RED . "Sua senha precisa ter no mínimo $minChar caracteres e no máximo $maxChar caracteres!");
-        return parent::getWrongMessage($commandMessages, $argumentUsed);
+        return $commandMessages->get('password-length', [
+            '{min_char}',
+            '{max_char}'
+        ], [
+            $minChar,
+            $maxChar
+        ]);
     }
+    
 }
