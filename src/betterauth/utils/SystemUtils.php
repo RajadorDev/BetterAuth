@@ -49,4 +49,32 @@ final class SystemUtils
         Server::getInstance()->getPluginManager()->callEvent($event);
         return $event;
     }
+
+    /**
+     * @param Player $player
+     * @param boolean $setAsFreeze
+     * @return void
+     */
+    public static function freezePlayer(Player $player, bool $setAsFreeze) 
+    {
+        $player->setDataProperty(
+            Player::DATA_NO_AI,
+            Player::DATA_TYPE_BYTE,
+            (int) $setAsFreeze
+        );
+    }
+
+    /**
+     * @param string $rawPassword
+     * @param integer $maxViewLength
+     * @return string
+     */
+    public static function hideChars(string $rawPassword, int $maxViewLength) : string 
+    {
+        return 
+        substr($rawPassword, 0, $maxViewLength) 
+        . 
+        substr($rawPassword, 0, strlen($rawPassword) - $maxViewLength);
+    }
+    
 }
