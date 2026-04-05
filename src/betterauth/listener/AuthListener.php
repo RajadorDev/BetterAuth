@@ -113,7 +113,7 @@ final class AuthListener implements Listener
                 if ($result instanceof Account && $result->matchAutoLogin($player)) 
                 {
                     try {
-                        SessionController::getInstance()->acceptLogin($player, $result, true);
+                        $this->session->acceptLogin($player, $result, true);
 
                     } catch (SessionAlreadyLoggedInException $error) {
 
