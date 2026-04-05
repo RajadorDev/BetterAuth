@@ -23,6 +23,7 @@ declare (strict_types=1);
 
 namespace betterauth\listener;
 
+use betterauth\event\PlayerAutomaticallyLoginFailEvent;
 use betterauth\event\PlayerChangePasswordEvent;
 use betterauth\event\PlayerLoggedOutEvent;
 use betterauth\event\PlayerLoginSucessfullyEvent;
@@ -93,4 +94,50 @@ final class LoginListener implements Listener
      */
     public function onRegisterAccount(PlayerRegisterEvent $event)
     {}
+
+    /**
+     * @priority LOWEST
+     */
+    public function onAutoLoginFail(PlayerAutomaticallyLoginFailEvent $event)
+    {
+        $player = $event->getPlayer();
+        $provider = Loader::getInstance()->getProvider();
+        $provider->isRegistered(
+            $player->getName()
+        )->then(
+            function (bool $result) use ($player) {
+
+                if (!SystemUtils::isValidPlayer($player)) {
+                    return;
+                }
+
+                if ($result) {
+                    $message = $this->messages->get('waiting-login');
+                } else {
+                    $confimationFormat = '';
+                    if ($this->settings->needToConfirmPassword()) {
+                        $confimationFormat = '<confirmar_senha: string>';
+                    }
+                    $message = $this->messages->get('waiting-register', '{confirmation}', $confimationFormat);
+                }
+                $player->sendMessage($message);
+            }
+        )->catch(
+            function () use ($player) {
+                if (SystemUtils::isValidPlayer($player)) {
+                    $player->sendMessage(
+                        $this->messages->get('generic-error')
+                    );
+                }
+            }
+        );
+
+        if ($this->settings->isAutoLoginEnabled()) {
+            Loader::getInstance()->teleportWhenJoin($player);
+        }
+
+        if (LoginTimeoutTask::isEnabled()) {
+            LoginTimeoutTask::getInstance()->addPlayer($player);
+        }
+    }
 }
