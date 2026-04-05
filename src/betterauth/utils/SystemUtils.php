@@ -74,7 +74,20 @@ final class SystemUtils
         return 
         substr($rawPassword, 0, $maxViewLength) 
         . 
-        substr($rawPassword, 0, strlen($rawPassword) - $maxViewLength);
+        str_repeat('*', strlen($rawPassword) - $maxViewLength);
     }
-    
+
+    /**
+     * @param string $chars
+     * @param integer $percent
+     * @return integer
+     */
+    public static function getCharsPercentLength(string $chars, int $percent) : int
+    {
+        $length = strlen($chars);
+        return (int) floor(
+            ($length / 100) * $percent
+        );
+    }
+
 }

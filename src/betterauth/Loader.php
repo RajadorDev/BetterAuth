@@ -45,6 +45,7 @@ use rajadordev\autoupdater\api\CheckUpdateScheduler;
 use rajadordev\autoupdater\api\plugin\defaults\github\GitHubPluginUpdaterAPI;
 use rajadordev\autoupdater\api\PluginUpdaterChecker;
 use SmartCommand\command\SmartCommand;
+use SmartCommand\message\DefaultMessages;
 
 class Loader extends PluginBase
 {
@@ -157,14 +158,21 @@ class Loader extends PluginBase
     }
 
     protected function registerCommands() {
+
+        $messages = DefaultMessages::PORTUGUESE();
+
+        $messages->add(
+            $this->messages->getFile()->getAll()
+        );
+
         $commandMap = $this->getServer()->getCommandMap();
         
         foreach (
             [
-                new LoginCommand,
-                new RegisterCommand,
-                new LogoutCommand,
-                new ChangePasswordCommand
+                new LoginCommand($messages),
+                new RegisterCommand($messages),
+                new LogoutCommand($messages),
+                new ChangePasswordCommand($messages)
             ] as $authCommand
         ) {
             $this->allowedNotLoggedInCommands[$authCommand->getName()] = $authCommand;
@@ -187,12 +195,7 @@ class Loader extends PluginBase
         );
     }
 
-    protected function pushMessagesToCommand(SmartCommand $command)
-    {
-        $command->getMessages()->add($this->messages->getFile()->getAll());
-    }
-
-    protected function initListeners()
+    protected function initListeners() 
     {
         foreach ([
             new LoginListener($this->settings, $this->messages),
