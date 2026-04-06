@@ -98,7 +98,7 @@ final class AuthListener implements Listener
         $playerName = $event->getPlayer()->getName();
 
         if ($this->session->getSessionByUsername($playerName) !== null) {
-            $event->setKickMessage($this->message->get('screen-cant-join', '{username}', $playerName));
+            $event->setKickMessage($this->message->get('session-already-created', '{username}', $playerName));
 
             $event->setCancelled(true);
         }

@@ -68,7 +68,7 @@ class LoginCommand extends SmartCommand
             $sender, 
             $password
         )->then(
-            function ($result) use ($sender, $password) {
+            function ($result) use ($sender) {
                 if (!SystemUtils::isValidPlayer($sender)) {
                     return;
                 }
