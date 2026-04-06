@@ -85,22 +85,22 @@ class RegisterCommand extends SmartCommand
                         if ($result instanceof Exception) {
                             throw $result;
                         }
-                        SystemUtils::callEvent(new PlayerRegisterEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
+                        SystemUtils::callEvent(new PlayerRegisterEvent($sender, $result));
                         $settings = Loader::getInstance()->getSettings();
                         $passwordToShow = $password;
                         if ($settings->isHidePasswordEnabled()) {
                             $percent = $settings->getShowPasswordPercent();
                             $passwordToShow = SystemUtils::hideChars($password, $percent);
                         }
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-registered', '{password}', $passwordToShow));
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('registered-successfully', '{password}', $passwordToShow));
                     } catch (AccountAlreadyRegisteredException $error) {
                         $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-alredy-registered'));
                     }
                 }
-            )->then(
+            )->catch(
                 function () use ($sender) {
                     if (SystemUtils::isValidPlayer($sender)) {
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-error'));
                     }
                 }
             );

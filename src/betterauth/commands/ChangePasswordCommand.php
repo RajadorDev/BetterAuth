@@ -97,7 +97,7 @@ class ChangePasswordCommand extends SmartCommand
             )->catch(
                 function () use ($sender) {
                     if (SystemUtils::isValidPlayer($sender)) {
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-error'));
                     }
                 }
             );
