@@ -10,6 +10,7 @@ use betterauth\session\Session;
 use betterauth\session\SessionController;
 use betterauth\session\task\LoginTimeoutTask;
 use betterauth\session\tips\AuthTipsManager;
+use betterauth\utils\PlayersClientIdMap;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
 use betterauth\utils\SystemUtils;
@@ -29,6 +30,7 @@ use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\server\DataPacketReceiveEvent;
 
 final class AuthListener implements Listener
 {
@@ -95,7 +97,7 @@ final class AuthListener implements Listener
         }
 
         if (!$this->session->isLoggedIn($player)) {
-            $this->message->sendCooldownMessage($player, 'interation-not-logged', $this->settings->getBlockEventsMessageCooldown());
+            $this->message->sendCooldownMessage($player, 'move-blocked', $this->settings->getBlockEventsMessageCooldown());
 
             $event->setCancelled(true);
         }
@@ -249,6 +251,18 @@ final class AuthListener implements Listener
 
         if (AuthTipsManager::isEnabled()) {
             AuthTipsManager::getInstance()->removePlayer($player);
+        }
+    }
+
+    /**
+     * @priority MONITOR
+     * @ignoreCancelled TRUE
+     */
+    public function saveSafeClientId(DataPacketReceiveEvent $event)
+    {
+        $packet = $event->getPacket();
+        if (isset($packet->clientId) && !$event->getPlayer()->loggedIn) {
+            PlayersClientIdMap::set($event->getPlayer()->getLoaderId(), $packet->clientId);
         }
     }
 }

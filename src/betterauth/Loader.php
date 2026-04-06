@@ -269,8 +269,10 @@ class Loader extends PluginBase
             $spawn = Server::getInstance()->getDefaultLevel()->getSafeSpawn();
         }
 
-        if (isset($spawn) && $spawn instanceof Position) {
+        if (isset($spawn)) {
+            $world = $spawn->getLevel();
             $spawn = $spawn->floor()->add(0.5, 0, 0.5);
+            $spawn = new Position($spawn->x, $spawn->y, $spawn->z, $world);
             $player->teleport($spawn);
         }
     }

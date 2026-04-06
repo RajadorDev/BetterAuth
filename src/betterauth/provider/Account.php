@@ -26,6 +26,7 @@ namespace betterauth\provider;
 use betterauth\provider\exception\WrongPasswordException;
 use betterauth\utils\DynamicObject;
 use betterauth\utils\PlayerPropertyDynamicObject;
+use betterauth\utils\PlayersClientIdMap;
 use pocketmine\Player;
 
 class Account extends PlayerPropertyDynamicObject
@@ -132,7 +133,7 @@ class Account extends PlayerPropertyDynamicObject
 
     public function matchAutoLogin(Player $player) : bool 
     {
-        return ($this->address === $player->getAddress() && ((string) $this->clientId) === ((string) $player->getClientId()));
+        return ($this->address === $player->getAddress() && ((string) $this->clientId) == ((string) PlayersClientIdMap::get($player)));
     }
 
     public function updateLastLogin(string $newAddress, float $newClientId) 

@@ -32,6 +32,7 @@ use betterauth\provider\types\file\task\GetAccountFileAsyncTask;
 use betterauth\provider\types\file\task\LoginAccountProcessAsyncTask;
 use betterauth\provider\types\file\task\RegisterAccountProcessAsyncTask;
 use betterauth\provider\types\file\task\UpdateAccountProcessAsyncTask;
+use betterauth\utils\PlayersClientIdMap;
 use betterauth\utils\promise\Promise;
 use betterauth\utils\promise\PromiseResolver;
 use pocketmine\Player;
@@ -80,7 +81,7 @@ class FileAccountProvider implements AccountProvider
             $this->getPlayerFilePath($player->getName()),
             $password,
             $player->getAddress(),
-            $player->getClientId()
+            PlayersClientIdMap::get($player) ?? -1.0
         );
         LoginAccountProcessAsyncTask::schedule($task);
         return $task->getPromise();
@@ -95,7 +96,7 @@ class FileAccountProvider implements AccountProvider
             return $resolver->getPromise();
         }
 
-        $account = Account::create($username, $password, $player->getAddress(), $player->getClientId());
+        $account = Account::create($username, $password, $player->getAddress(), PlayersClientIdMap::get($player) ?? -1.0);
         $task = new RegisterAccountProcessAsyncTask($this->getPlayerFilePath($username), $account);
         $task::schedule($task);
         return $task->getPromise();
