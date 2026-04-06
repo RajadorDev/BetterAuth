@@ -30,10 +30,14 @@ use betterauth\provider\exception\AccountAlreadyRegisteredException;
 use betterauth\provider\exception\WrongPasswordException;
 use betterauth\provider\exception\AccountNotFoundException;
 
+/**
+ * This interface will manage the account saving, updating and data collection
+ */
 interface AccountProvider
 {
 
     /**
+     * Try login a player using a raw password (raw password === password not encrypted)
      * @param Player $player
      * @param string $password
      * @return Promise<AuthException|AccountNotFoundException|WrongPasswordException|Account>
@@ -41,19 +45,22 @@ interface AccountProvider
     public function tryLogin(Player $player, string $password) : Promise;
 
     /**
+     * Check if player is registered
      * @param string $username
      * @return Promise<boolean>
      */
     public function isRegistered(string $username) : Promise;
 
     /**
+     * Try to register a new account
      * @param Player $player
-     * @param string $password
+     * @param string $password Raw password
      * @return Promise<AuthException|AccountAlreadyRegisteredException|Account>
      */
     public function tryRegister(Player $player, string $password) : Promise;
 
     /**
+     * Try to find account by his username
      * @param string $username
      * @return Promise<AccountNotFoundException|Account>
      */
@@ -61,13 +68,16 @@ interface AccountProvider
 
 
     /**
-     * NOTE: This method should not be called to save unregistered accounts!
+     * NOTE: This method should not be called to save unregistered accounts! It will return AccountNotFoundException
+     * Only AccountProvider::tryRegister will save a unregistered account
+     * 
      * @param Account $account
-     * @return Promise<AccountNotFoundException|null>
+     * @return Promise<AccountNotFoundException|true>
      */
     public function updateAccount(Account $account) : Promise;
 
     /**
+     * Change a account password. It will fail if the check password is different of the old password
      * @param string $playerName
      * @param string $rawCheckPassword Password used to check if the player can really change
      * @param string $newPasswordRaw
