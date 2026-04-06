@@ -271,7 +271,7 @@ class Loader extends PluginBase
             ],
             [
                 $player->getName(),
-                $player->getServer()->getPort()
+                (string) $player->getServer()->getPort()
             ],
             '',
             false
