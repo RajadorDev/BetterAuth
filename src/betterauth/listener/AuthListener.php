@@ -13,6 +13,7 @@ use betterauth\session\tips\AuthTipsManager;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
 use betterauth\utils\SystemUtils;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\Player;
 
 use pocketmine\event\block\BlockPlaceEvent;
@@ -138,7 +139,7 @@ final class AuthListener implements Listener
                 if (!SystemUtils::isValidPlayer($player)) {
                     return;
                 }
-                
+
                 if ($result instanceof Account && $result->matchAutoLogin($player)) 
                 {
                     try {
@@ -195,7 +196,7 @@ final class AuthListener implements Listener
      * @priority LOWEST
      * @ignoreCancelled TRUE
      */
-    public function onPlace(BlockPlaceEvent $event)
+    public function onPlace(BlockBreakEvent $event)
     {
         $player = $event->getPlayer();
 
