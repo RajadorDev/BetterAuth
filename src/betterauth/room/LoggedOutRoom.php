@@ -54,7 +54,7 @@ class LoggedOutRoom
             $worldName = $settings->getString(Settings::LOGGED_OUT_WORLD, '', true);
 
             if (!$server->loadLevel($worldName)) {
-                $plugin->getLogger()->alert("Mapa $worldName não existe, portantanto o sistema de sala de espera de login foi desativado!");
+                $plugin->getLogger()->warning("Mapa $worldName não existe, portantanto o sistema de sala de espera de login foi desativado!");
                 return null;
             }
 

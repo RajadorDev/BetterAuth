@@ -30,11 +30,14 @@ use betterauth\event\PlayerLoginSucessfullyEvent;
 use betterauth\event\PlayerRegisterEvent;
 use betterauth\Loader;
 use betterauth\session\AuthTimeout;
+use betterauth\session\LoginAttempts;
+use betterauth\session\SessionController;
 use betterauth\session\task\LoginTimeoutTask;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
 use betterauth\utils\SystemUtils;
 use pocketmine\event\Listener;
+use pocketmine\Server;
 
 final class LoginListener implements Listener
 {
@@ -67,6 +70,16 @@ final class LoginListener implements Listener
         if (LoginTimeoutTask::isEnabled()) {
             LoginTimeoutTask::getInstance()->removePlayer($player);
         }
+
+        $controller = SessionController::getInstance();
+        $playerName = $player->getName();
+        $playerName = strtolower($playerName);
+        foreach (Server::getInstance()->getOnlinePlayers() as $target) {
+            if (!$controller->isLoggedIn($target) && strtolower($target->getName()) === $playerName) {
+                $closeMessage = $this->messages->get('session-already-created', '{username}', $target->getName());
+                $target->close('', $closeMessage);
+            }
+        }
     }
 
     /**
@@ -74,13 +87,22 @@ final class LoginListener implements Listener
      */
     public function onLogout(PlayerLoggedOutEvent $event)
     {
+        
+        $player = $event->getPlayer();
         if (!Loader::getInstance()->allowNotLoggedInPlayerMove() && !$event->wasDisconnected()) {
-            SystemUtils::freezePlayer($event->getPlayer(), true);
+            SystemUtils::freezePlayer($player, true);
         }
 
+        
         if (LoginTimeoutTask::isEnabled() && !$event->wasDisconnected()) {
-            LoginTimeoutTask::getInstance()->addPlayer($event->getPlayer());
+            LoginTimeoutTask::getInstance()->addPlayer($player);
         }
+
+        if ($this->settings->hideLoggoutPlayersNametag()) {
+            $player->setNameTagVisible(true);
+        }
+
+        LoginAttempts::clear($player);
     }
 
     /**
@@ -138,6 +160,10 @@ final class LoginListener implements Listener
 
         if (LoginTimeoutTask::isEnabled()) {
             LoginTimeoutTask::getInstance()->addPlayer($player);
+        }
+
+        if ($this->settings->hideLoggoutPlayersNametag()) {
+            $player->setNameTagVisible(false);
         }
     }
 }

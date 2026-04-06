@@ -69,7 +69,7 @@ class LoginCommand extends SmartCommand
             $sender, 
             $password
         )->then(
-            function ($result) use ($sender, $password) {
+            function ($result) use ($sender) {
                 if (!SystemUtils::isValidPlayer($sender)) {
                     return;
                 }
@@ -93,11 +93,11 @@ class LoginCommand extends SmartCommand
             }
         )->catch(
             function () use ($sender) {
-                if (SystemUtils::isValidPlayer($sender)) {
+                if (!SystemUtils::isValidPlayer($sender)) {
                     return;
                 }
 
-                $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+                $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-error'));
             }
         );
     }

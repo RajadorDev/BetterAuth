@@ -63,6 +63,8 @@ class Settings
 
     const AUTO_LOGIN = 'auto-login';
 
+    const HIDE_NAMETAG = 'hide-loggout-players';
+
     /** @var Config */
     protected $file;
 
@@ -161,6 +163,11 @@ class Settings
     public function isAutoLoginEnabled() : bool 
     {
         return $this->getBool(self::AUTO_LOGIN, true, false);
+    }
+
+    public function hideLoggoutPlayersNametag() : bool 
+    {
+        return $this->getBool(self::HIDE_NAMETAG, true, false);
     }
 
 }

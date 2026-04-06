@@ -28,6 +28,7 @@ use betterauth\commands\arguments\PasswordArgument;
 use betterauth\event\PlayerRegisterEvent;
 use betterauth\Loader;
 use betterauth\provider\exception\AccountAlreadyRegisteredException;
+use betterauth\session\exception\SessionAlreadyLoggedInException;
 use betterauth\session\SessionController;
 use betterauth\utils\SystemUtils;
 use Exception;
@@ -86,22 +87,24 @@ class RegisterCommand extends SmartCommand
                         if ($result instanceof Exception) {
                             throw $result;
                         }
-                        SystemUtils::callEvent(new PlayerRegisterEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
+                        SystemUtils::callEvent(new PlayerRegisterEvent($sender, $result));
+                        SessionController::getInstance()->acceptLogin($sender, $result, false);
                         $settings = Loader::getInstance()->getSettings();
                         $passwordToShow = $password;
                         if ($settings->isHidePasswordEnabled()) {
                             $percent = $settings->getShowPasswordPercent();
-                            $passwordToShow = SystemUtils::hideChars($password, $percent);
+                            $percentLength = SystemUtils::getCharsPercentLength($password, $percent);
+                            $passwordToShow = SystemUtils::hideChars($password, $percentLength);
                         }
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-registered', '{password}', $passwordToShow));
-                    } catch (AccountAlreadyRegisteredException $error) {
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-alredy-registered'));
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('registered-successfully', '{password}', $passwordToShow));
+                    } catch (SessionAlreadyLoggedInException $error) {
+                        $sender->close('', Loader::getInstance()->getMessages()->get('account-alredy-registered', null, null, '', false));
                     }
                 }
-            )->then(
+            )->catch(
                 function () use ($sender) {
                     if (SystemUtils::isValidPlayer($sender)) {
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-reason'));
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('generic-error'));
                     }
                 }
             );

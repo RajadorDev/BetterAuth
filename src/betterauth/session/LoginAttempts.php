@@ -63,4 +63,9 @@ class LoginAttempts
         }
         return true;
     }
+
+    public static function clear(Player $player)
+    {
+        unset(self::$maxLoginAttempts[$player->getLoaderId()]);
+    }
 }

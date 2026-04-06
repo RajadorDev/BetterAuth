@@ -15,7 +15,7 @@ password:
   # Seta o tamanho minimo em caracteres da senha que o jogador precisa registrar
   min-length: 4
   # Seta o tamanho maximo da senha do jogador
-  max-password-length: 25
+  max-length: 25
 
 
 # Cooldown da mensagem enviada quando o jogador é bloquado 
@@ -55,4 +55,8 @@ max-login-attempts: 5
 
 # Teleportar o jogador para o lobby quando entrar (esta opção só funcionará se a opção logged-out-room estiver desativada ou não ser inicializada corretamente)
 join-player-teleport: true
+
+
+# Ocultar nome do jogador quando ele não está autenticado?
+hide-loggout-players: true
 ...

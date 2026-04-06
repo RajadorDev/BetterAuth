@@ -1,19 +1,18 @@
 ---
-registered-successfully: "§aVocê foi registrado com sucesso! Sua senha: {password}"
+registered-successfully: "§7Você foi registrado com §l§aSucesso§r§7! Sua senha: §b{password}"
 passwords-dont-match: "§cAs suas palavras passe não se coincidem!"
 password-confirm-required: "§7Confirme a sua senha: §f/registrar <senha> <confirmar-senha>"
 player-loged-in-sucessfully: "§aLogado com sucesso"
 auto-login-sucessfully: "§aVocê foi logado automaticamente!"
-login-sucessfully: "§fVocê foi logado com §a§lSucesso§r§7!"
-change-password: "Você trocou a sua senha nova senha: {password}"
-generic-error: "Ocorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
+login-sucessfully: "§7Você foi logado com §a§lSucesso§r§7!"
+generic-error: "§cOcorreu um erro desconhecido ao se autenticar. Tente novamente mais tarde!"
 already-logged-in: '§cVocê já está logado!'
-change-password-successfully: "Você trocou sua senha, nova senha: {password}"
+change-password-successfully: "§7Você trocou sua senha, nova senha: {password}"
 wrong-password-confirm: "§cA sua senha atual está incorreta"
 interation-not-logged: "§7Você precisa logar para interagir ou se mover"
 not-logged-in-command: '§cVocê precisa logar para executar outros comandos!'
-account-alredy-registered: '§fSua conta já está registrada'
-logout: "§fVocê foi deslogado da sua conta"
+account-alredy-registered: '§cSua conta já está registrada!'
+logout: "§eVocê foi deslogado da sua conta"
 login-timeout-screen: '§cVocê demorou muito para se autenticar!'
 screen-max-attempts: '§cVocê tentou logar muitas vezes'
 session-already-created: "§cJá há um usuario logado na conta §f{username}§c!"
@@ -21,4 +20,5 @@ password-length: "§cSua senha precisa ter no mínimo §f{min_char} §ccaractere
 join-message: "§8----====(§aBetter§bAuth§8)====----\n§8-\n§8-§7  Bem vindo ao servidor §f{username}§7!\n§8-\n§8-  §7IP: 0.0.0.0\n§8-  §7Porta: §f{server_port}\n§8-  \n§8-  §7Autenticação protegida e criptografada pelo §aBetter§bAuth§7!\n§8- "
 waiting-login: "Bem vindo de volta, para logar use: §f/login <senha: string>"
 waiting-register: "Bem vindo! Para se registrar use: §f/register <senha: string> {confirmation}"
+no-logged-in: '§cVocê não está logado'
 ...
