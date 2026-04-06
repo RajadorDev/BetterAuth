@@ -126,7 +126,7 @@ class FileAccountProvider implements AccountProvider
 
     public function changePassword(string $playerName, string $rawCheckPassword, string $newPasswordRaw): Promise
     {
-        if ($this->syncIsRegistered($playerName)) {
+        if (!$this->syncIsRegistered($playerName)) {
             $resolver = new PromiseResolver;
             $resolver->resolve(new AccountNotFoundException("Account $playerName does not found"));
             return $resolver->getPromise();
