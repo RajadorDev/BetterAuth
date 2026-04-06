@@ -43,6 +43,7 @@ use betterauth\session\task\LoginTimeoutTask;
 use betterauth\session\tips\AuthTipsManager;
 use betterauth\utils\SystemUtils;
 use pocketmine\command\Command;
+use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use rajadordev\autoupdater\api\CheckUpdateScheduler;
@@ -262,7 +263,16 @@ class Loader extends PluginBase
 
     public function teleportWhenJoin(Player $player)
     {
-        //TODO
+        if ($this->loggedOutRoom) {
+            $spawn = $this->loggedOutRoom->getSpawn();
+        } else if ($this->settings->joinPlayerTeleportEnabled()) {
+            $spawn = Server::getInstance()->getDefaultLevel()->getSafeSpawn();
+        }
+
+        if (isset($spawn) && $spawn instanceof Position) {
+            $spawn = $spawn->floor()->add(0.5, 0, 0.5);
+            $player->teleport($spawn);
+        }
     }
 
     protected function initListeners() 

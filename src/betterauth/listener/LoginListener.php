@@ -93,6 +93,13 @@ final class LoginListener implements Listener
         if (AuthTipsManager::isEnabled()) {
             AuthTipsManager::getInstance()->removePlayer($player);
         }
+
+        if ($room = Loader::getInstance()->getLoggedOutRoom()) {
+            if ($room->mustTeleportToTargetWorld($player)) {
+                $targetSpawn = $room->getTargetSpawn()->add(0.5, 0, 0.5);
+                $player->teleport($targetSpawn);
+            }
+        }
     }
 
     /**

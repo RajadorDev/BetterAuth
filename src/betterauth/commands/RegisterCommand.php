@@ -99,7 +99,10 @@ class RegisterCommand extends SmartCommand
                         }
                         $sender->sendMessage(Loader::getInstance()->getMessages()->get('registered-successfully', '{password}', $passwordToShow));
                     } catch (SessionAlreadyLoggedInException $error) {
-                        $sender->close('', Loader::getInstance()->getMessages()->get('account-alredy-registered', null, null, '', false));
+                        $sender->close('', Loader::getInstance()->getMessages()->get('account-already-registered', null, null, '', false));
+                    } catch (AccountAlreadyRegisteredException $error) {
+                        $message = Loader::getInstance()->getMessages()->get('account-already-registered');
+                        $sender->sendMessage($message);
                     }
                 }
             )->catch(

@@ -192,4 +192,9 @@ class Settings
         return $this->getString($typeIdentifier . '.' . $settingName, '', true);
     }
 
+    public function joinPlayerTeleportEnabled() : bool 
+    {
+        return $this->getBool(self::JOIN_PLAYER_TELEPORT, true, false);
+    }
+
 }

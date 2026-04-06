@@ -11,7 +11,7 @@ change-password-successfully: "§7Você trocou sua senha, nova senha: {password}
 wrong-password-confirm: "§cA sua senha atual está incorreta"
 interation-not-logged: "§7Você precisa logar para interagir ou se mover"
 not-logged-in-command: '§cVocê precisa logar para executar outros comandos!'
-account-alredy-registered: '§cSua conta já está registrada!'
+account-already-registered: '§cSua conta já está registrada!'
 logout: "§eVocê foi deslogado da sua conta"
 login-timeout-screen: '§cVocê demorou muito para se autenticar!'
 screen-max-attempts: '§cVocê tentou logar muitas vezes'
