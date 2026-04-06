@@ -9,7 +9,7 @@ generic-error: "§cOcorreu um erro desconhecido ao se autenticar. Tente novament
 already-logged-in: '§cVocê já está logado!'
 change-password-successfully: "§7Você trocou sua senha, nova senha: {password}"
 wrong-password-confirm: "§cA sua senha atual está incorreta"
-interation-not-logged: "§7Você precisa logar para interagir ou se mover"
+interation-not-logged: "§7Você precisa logar para interagir com o servidor!"
 not-logged-in-command: '§cVocê precisa logar para executar outros comandos!'
 account-already-registered: '§cSua conta já está registrada!'
 logout: "§eVocê foi deslogado da sua conta"
@@ -22,4 +22,5 @@ waiting-login: "Bem vindo de volta, para logar use: §f/login <senha: string>"
 waiting-register: "Bem vindo! Para se registrar use: §f/register <senha: string> {confirmation}"
 no-logged-in: '§cVocê não está logado'
 wrong-password: '§cSenha errada!'
+move-blocked: "§cVocê precisa logar para poder se mover!"
 ...
