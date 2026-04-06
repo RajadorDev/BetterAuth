@@ -34,6 +34,7 @@ use betterauth\utils\SystemUtils;
 use Exception;
 use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
+use SmartCommand\command\rule\defaults\CooldownRule;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
 use SmartCommand\message\CommandMessages;
@@ -58,7 +59,7 @@ class RegisterCommand extends SmartCommand
     {
         $this->registerArgument(0, new PasswordArgument('password', true));
         $this->registerArgument(1, new PasswordArgument('password-confirm', Loader::getInstance()->getSettings()->needToConfirmPassword()));
-        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
+        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule(), new CooldownRule(CooldownRule::secondsToMs(1)));
     }
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
