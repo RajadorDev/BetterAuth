@@ -132,12 +132,14 @@ class Account extends PlayerPropertyDynamicObject
 
     public function matchAutoLogin(Player $player) : bool 
     {
-        return ($this->address === $player->getAddress() && $this->clientId === $player->getClientId());
+        return ($this->address === $player->getAddress() && ((string) $this->clientId) === ((string) $player->getClientId()));
     }
 
-    public function updateLastLogin() 
+    public function updateLastLogin(string $newAddress, float $newClientId) 
     {
         $this->lastLoginAt = microtime(true);
+        $this->address = $newAddress;
+        $this->clientId = $newClientId;
     }
 
     /**

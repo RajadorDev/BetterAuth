@@ -138,7 +138,7 @@ final class AuthListener implements Listener
                 if (!SystemUtils::isValidPlayer($player)) {
                     return;
                 }
-
+                
                 if ($result instanceof Account && $result->matchAutoLogin($player)) 
                 {
                     try {

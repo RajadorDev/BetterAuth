@@ -29,17 +29,19 @@ use betterauth\provider\exception\WrongPasswordException;
 class LoginAccountProcessAsyncTask extends FileAccountProcessAsyncTask
 {
 
-    public function __construct(string $path, string $password)
+    public function __construct(string $path, string $password, string $playerAddress, float $playerClientId)
     {
         return parent::__construct([
-            'password' => $password
+            'password' => $password,
+            'address' => $playerAddress,
+            'clientId' => $playerClientId
         ], $path);
     }
 
     protected function processAccountAndResult(Account $account, array $safeVarValues)
     {
         if ($account->matchPassword($safeVarValues['password'])) {
-            $account->updateLastLogin();
+            $account->updateLastLogin($safeVarValues['address'], $safeVarValues['clientId']);
             $account->save($safeVarValues['file_path']);
             return $account;
         }

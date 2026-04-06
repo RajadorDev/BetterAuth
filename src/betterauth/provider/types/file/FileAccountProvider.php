@@ -78,7 +78,9 @@ class FileAccountProvider implements AccountProvider
     {
         $task = new LoginAccountProcessAsyncTask(
             $this->getPlayerFilePath($player->getName()),
-            $password
+            $password,
+            $player->getAddress(),
+            $player->getClientId()
         );
         LoginAccountProcessAsyncTask::schedule($task);
         return $task->getPromise();
