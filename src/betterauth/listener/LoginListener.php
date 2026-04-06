@@ -134,7 +134,7 @@ final class LoginListener implements Listener
 
                     
                     if (AuthTipsManager::isEnabled()) {
-                        $tipId = $isPlayerRegistered ? Settings::AUTH_TIPS_REGISTER : Settings::AUTH_TIPS_LOGIN;
+                        $tipId = $isPlayerRegistered ? Settings::AUTH_TIPS_LOGIN : Settings::AUTH_TIPS_REGISTER;
                         AuthTipsManager::getInstance()->addPlayerTip($player, $tipId);
                     }
                 }
