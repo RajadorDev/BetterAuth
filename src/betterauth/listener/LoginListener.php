@@ -195,7 +195,7 @@ final class LoginListener implements Listener
         );
 
         if ($this->settings->isAutoLoginEnabled()) {
-            Loader::getInstance()->teleportWhenJoin($player);
+            Loader::getInstance()->teleportToLobby($player);
         }
 
         if (LoginTimeoutTask::isEnabled()) {

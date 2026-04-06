@@ -241,7 +241,7 @@ class Loader extends PluginBase
         }
         
         if (!$this->getSettings()->isAutoLoginEnabled()) {
-            $this->teleportWhenJoin($player);
+            $this->teleportToLobby($player);
         }
 
         $message = $this->messages->get(
@@ -261,7 +261,7 @@ class Loader extends PluginBase
         $player->sendMessage($message);
     }
 
-    public function teleportWhenJoin(Player $player)
+    public function teleportToLobby(Player $player)
     {
         if ($this->loggedOutRoom) {
             $spawn = $this->loggedOutRoom->getSpawn();
