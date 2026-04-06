@@ -15,7 +15,7 @@ password:
   # Seta o tamanho minimo em caracteres da senha que o jogador precisa registrar
   min-length: 4
   # Seta o tamanho maximo da senha do jogador
-  max-password-length: 25
+  max-length: 25
 
 
 # Cooldown da mensagem enviada quando o jogador é bloquado 
