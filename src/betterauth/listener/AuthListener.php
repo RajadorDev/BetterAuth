@@ -225,7 +225,7 @@ final class AuthListener implements Listener
     {
         $player = $event->getPlayer();
 
-        $session = $this->session->getSessionByUsername($player->getName());
+        $session = $this->session->getPlayerSession($player);
         if ($session instanceof Session) {
             $session->destroy(true);
         }
