@@ -26,7 +26,6 @@ use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\utils\EventUtils;
 
 final class AuthListener implements Listener
 {
@@ -115,7 +114,7 @@ final class AuthListener implements Listener
 
         if (!$this->settings->isAutoLoginEnabled()) 
         {
-            EventUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
+            SystemUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
             return;
         }
 
@@ -135,7 +134,7 @@ final class AuthListener implements Listener
                         $player->close('', $this->message->get('session-already-created', null, null, 'Message not found', false));
                     }
                 } else {
-                    EventUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
+                    SystemUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
                 }
             }
         )->catch(

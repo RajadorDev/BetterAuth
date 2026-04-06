@@ -29,7 +29,6 @@ use betterauth\provider\Account;
 use betterauth\session\exception\SessionAlreadyLoggedInException;
 use betterauth\utils\SystemUtils;
 use pocketmine\Player;
-use pocketmine\utils\EventUtils;
 use SmartCommand\utils\SingletonTrait;
 
 final class SessionController 
@@ -100,7 +99,7 @@ final class SessionController
         $this->sessionsByName[$playerName] 
         = Session::create($player, $account, $wasLoggedInAutomatically);
 
-        EventUtils::callEvent(new PlayerLoginSucessfullyEvent($player, $session, $wasLoggedInAutomatically));
+        SystemUtils::callEvent(new PlayerLoginSucessfullyEvent($player, $session, $wasLoggedInAutomatically));
         return $session;
     }
 

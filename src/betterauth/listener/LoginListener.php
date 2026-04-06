@@ -48,6 +48,10 @@ final class LoginListener implements Listener
     /** @var SystemMessages */
     protected $messages;
     
+    /**
+     * @param Settings $settings
+     * @param SystemMessages $messages
+     */
     public function __construct(Settings $settings, SystemMessages $messages)
     {
         $this->settings = $settings;
@@ -80,6 +84,10 @@ final class LoginListener implements Listener
                 $target->close('', $closeMessage);
             }
         }
+
+        if ($this->settings->hideLoggoutPlayersNametag()) {
+            $player->setNameTagVisible(true);
+        }
     }
 
     /**
@@ -89,17 +97,21 @@ final class LoginListener implements Listener
     {
         
         $player = $event->getPlayer();
-        if (!Loader::getInstance()->allowNotLoggedInPlayerMove() && !$event->wasDisconnected()) {
-            SystemUtils::freezePlayer($player, true);
-        }
-
         
-        if (LoginTimeoutTask::isEnabled() && !$event->wasDisconnected()) {
-            LoginTimeoutTask::getInstance()->addPlayer($player);
-        }
+        if (!$event->wasDisconnected()) {
 
-        if ($this->settings->hideLoggoutPlayersNametag()) {
-            $player->setNameTagVisible(true);
+            if (!Loader::getInstance()->allowNotLoggedInPlayerMove()) {
+                SystemUtils::freezePlayer($player, true);
+            }
+
+            if (LoginTimeoutTask::isEnabled()) {
+                LoginTimeoutTask::getInstance()->addPlayer($player);
+            }
+
+            if ($this->settings->hideLoggoutPlayersNametag()) {
+                $player->setNameTagVisible(false);
+            }
+
         }
 
         LoginAttempts::clear($player);
