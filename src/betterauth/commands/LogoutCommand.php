@@ -50,6 +50,7 @@ class LogoutCommand extends SmartCommand
 
     protected function prepare()
     {
+        $this->setPrefix(Loader::getInstance()->getSettings()->getPrefix());
         $this->registerRules(new OnlyInGameCommandRule(), new CooldownRule(CooldownRule::secondsToMs(1)));
     }
 

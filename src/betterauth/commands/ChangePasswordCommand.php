@@ -57,6 +57,7 @@ class ChangePasswordCommand extends SmartCommand
 
     protected function prepare()
     {
+        $this->setPrefix(Loader::getInstance()->getSettings()->getPrefix());
         $this->registerArgument(0, new PasswordArgument('password', true));
         $this->registerArgument(1, new PasswordArgument('password-confirm', true));
         $this->registerRules(new OnlyInGameCommandRule(), new CooldownRule(1000, true));
