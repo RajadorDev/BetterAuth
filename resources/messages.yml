@@ -21,4 +21,5 @@ join-message: "§8----====(§aBetter§bAuth§8)====----\n§8-\n§8-§7  Bem vind
 waiting-login: "Bem vindo de volta, para logar use: §f/login <senha: string>"
 waiting-register: "Bem vindo! Para se registrar use: §f/register <senha: string> {confirmation}"
 no-logged-in: '§cVocê não está logado'
+wrong-password: '§cSenha errada!'
 ...

@@ -45,7 +45,7 @@ hide-password:
   # Se false: a senha será exibida completamente
   enabled: true
   # Porcentagem de caracteres que serão exibidos:
-  chars-percent: 20.0
+  chars-percent: 25.0
 
 # Tempo maximo para que o jogador registre/logue no servidor (se zerado desativa o tempo maximo) em segundos
 max-auth-time: 25
@@ -59,4 +59,17 @@ join-player-teleport: true
 
 # Ocultar nome do jogador quando ele não está autenticado?
 hide-loggout-players: true
+
+# Sistema que envia oque o comando que o jogador deve fazer na tela dele (login/register)
+auth-tips:
+  # Ativa o sistema de dicas
+  enabled: true
+  # Textos enviados como dica para o jogador se logar
+  login:
+    tip: "§b§lBEM VINDO DE VOLTA §f{username}§r\n \n \n "
+    popup: "§7Você precisa se logar usando: §f/login <senha: string>"
+  # Textos enviados como dica para o jogador se registrar
+  register:
+    tip: "§b§lBEM VINDO §r§f{username}\n \n \n "
+    popup: "§7Seja bem vindo! Se registre usando §f/register <senha: string> {password_confirmation}"
 ...

@@ -28,6 +28,7 @@ use betterauth\Loader;
 use betterauth\session\SessionController;
 use pocketmine\command\CommandSender;
 use SmartCommand\command\CommandArguments;
+use SmartCommand\command\rule\defaults\CooldownRule;
 use SmartCommand\command\rule\defaults\OnlyInGameCommandRule;
 use SmartCommand\command\SmartCommand;
 use SmartCommand\message\CommandMessages;
@@ -50,7 +51,7 @@ class LogoutCommand extends SmartCommand
     protected function prepare()
     {
         $this->setPrefix(Loader::getInstance()->getSettings()->getPrefix());
-        $this->registerRules(new OnlyInGameCommandRule());
+        $this->registerRules(new OnlyInGameCommandRule(), new CooldownRule(CooldownRule::secondsToMs(1)));
     }
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)

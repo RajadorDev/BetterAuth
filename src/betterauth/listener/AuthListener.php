@@ -8,7 +8,8 @@ use betterauth\provider\Account;
 use betterauth\session\exception\SessionAlreadyLoggedInException;
 use betterauth\session\Session;
 use betterauth\session\SessionController;
-
+use betterauth\session\task\LoginTimeoutTask;
+use betterauth\session\tips\AuthTipsManager;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
 use betterauth\utils\SystemUtils;
@@ -26,7 +27,6 @@ use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\utils\EventUtils;
 
 final class AuthListener implements Listener
 {
@@ -115,7 +115,7 @@ final class AuthListener implements Listener
 
         if (!$this->settings->isAutoLoginEnabled()) 
         {
-            EventUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
+            SystemUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
             return;
         }
 
@@ -135,7 +135,7 @@ final class AuthListener implements Listener
                         $player->close('', $this->message->get('session-already-created', null, null, 'Message not found', false));
                     }
                 } else {
-                    EventUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
+                    SystemUtils::callEvent(new PlayerAutomaticallyLoginFailEvent($player));
                 }
             }
         )->catch(
@@ -228,6 +228,14 @@ final class AuthListener implements Listener
         $session = $this->session->getPlayerSession($player);
         if ($session instanceof Session) {
             $session->destroy(true);
+        }
+
+        if (LoginTimeoutTask::isEnabled()) {
+            LoginTimeoutTask::getInstance()->removePlayer($player);
+        }
+
+        if (AuthTipsManager::isEnabled()) {
+            AuthTipsManager::getInstance()->removePlayer($player);
         }
     }
 }

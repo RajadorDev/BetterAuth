@@ -33,6 +33,7 @@ use betterauth\session\AuthTimeout;
 use betterauth\session\LoginAttempts;
 use betterauth\session\SessionController;
 use betterauth\session\task\LoginTimeoutTask;
+use betterauth\session\tips\AuthTipsManager;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
 use betterauth\utils\SystemUtils;
@@ -48,6 +49,10 @@ final class LoginListener implements Listener
     /** @var SystemMessages */
     protected $messages;
     
+    /**
+     * @param Settings $settings
+     * @param SystemMessages $messages
+     */
     public function __construct(Settings $settings, SystemMessages $messages)
     {
         $this->settings = $settings;
@@ -80,6 +85,10 @@ final class LoginListener implements Listener
                 $target->close('', $closeMessage);
             }
         }
+
+        if ($this->settings->hideLoggoutPlayersNametag()) {
+            $player->setNameTagVisible(true);
+        }
     }
 
     /**
@@ -89,17 +98,37 @@ final class LoginListener implements Listener
     {
         
         $player = $event->getPlayer();
-        if (!Loader::getInstance()->allowNotLoggedInPlayerMove() && !$event->wasDisconnected()) {
-            SystemUtils::freezePlayer($player, true);
-        }
-
         
-        if (LoginTimeoutTask::isEnabled() && !$event->wasDisconnected()) {
-            LoginTimeoutTask::getInstance()->addPlayer($player);
-        }
+        if (!$event->wasDisconnected()) {
 
-        if ($this->settings->hideLoggoutPlayersNametag()) {
-            $player->setNameTagVisible(true);
+            if (!Loader::getInstance()->allowNotLoggedInPlayerMove()) {
+                SystemUtils::freezePlayer($player, true);
+            }
+
+            if (LoginTimeoutTask::isEnabled()) {
+                LoginTimeoutTask::getInstance()->addPlayer($player);
+            }
+
+            if ($this->settings->hideLoggoutPlayersNametag()) {
+                $player->setNameTagVisible(false);
+            }
+
+            Loader::getInstance()->getProvider()->isRegistered(
+                $player->getName()
+            )->then(
+                function (bool $isPlayerRegistered) use ($player) {
+                    if (!SystemUtils::isValidPlayer($player)) {
+                        return;
+                    }
+
+                    
+                    if (AuthTipsManager::isEnabled()) {
+                        $tipId = $isPlayerRegistered ? Settings::AUTH_TIPS_REGISTER : Settings::AUTH_TIPS_LOGIN;
+                        AuthTipsManager::getInstance()->addPlayerTip($player, $tipId);
+                    }
+                }
+            );
+
         }
 
         LoginAttempts::clear($player);
@@ -135,14 +164,20 @@ final class LoginListener implements Listener
 
                 if ($result) {
                     $message = $this->messages->get('waiting-login');
+                    $tipId = Settings::AUTH_TIPS_LOGIN;
                 } else {
                     $confimationFormat = '';
                     if ($this->settings->needToConfirmPassword()) {
                         $confimationFormat = '<confirmar_senha: string>';
                     }
                     $message = $this->messages->get('waiting-register', '{confirmation}', $confimationFormat);
+                    $tipId = Settings::AUTH_TIPS_REGISTER;
                 }
                 $player->sendMessage($message);
+
+                if (AuthTipsManager::isEnabled()) {
+                    AuthTipsManager::getInstance()->addPlayerTip($player, $tipId);
+                }
             }
         )->catch(
             function () use ($player) {
