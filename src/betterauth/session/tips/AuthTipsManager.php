@@ -53,8 +53,21 @@ class AuthTipsManager extends PluginTask
     {
         $settings = Loader::getInstance()->getSettings();
         $popupText = $settings->getAuthTipTextValue($tipType, Settings::AUTH_TIPS_POPUP_TEXT);
+
+        $popupText = str_replace(
+            '{password_confirmation}',
+            '<confirmar_senha: string>',
+            $popupText
+        );
+
         $tipText = $settings->getAuthTipTextValue($tipType, Settings::AUTH_TIPS_TIP_TEXT);
-        $this->tipsBeingSended[$player->getLoaderId()] = new AuthTipInstance($player, $tipText, $popupText);
+        $tipText = str_replace(
+            '{username}',
+            $player->getName(),
+            $tipText
+        );
+        $this->tipsBeingSended[$player->getLoaderId()] = $instance = new AuthTipInstance($player, $tipText, $popupText);
+        $instance->sendTips();
     }
 
     public function removePlayer(Player $player)

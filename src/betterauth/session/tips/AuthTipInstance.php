@@ -53,11 +53,11 @@ class AuthTipInstance
         }
     }
 
-    protected function sendTips()
+    public function sendTips()
     {
         $player = $this->player;
         $player->sendTip($this->tip);
         $player->sendPopup($this->popup);
     }
-    
+
 }

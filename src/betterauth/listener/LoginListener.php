@@ -89,6 +89,10 @@ final class LoginListener implements Listener
         if ($this->settings->hideLoggoutPlayersNametag()) {
             $player->setNameTagVisible(true);
         }
+
+        if (AuthTipsManager::isEnabled()) {
+            AuthTipsManager::getInstance()->removePlayer($player);
+        }
     }
 
     /**

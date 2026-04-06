@@ -106,6 +106,8 @@ class Loader extends PluginBase
         $this->tryAutoUpdate();
 
         $this->registerTimeoutTask();
+
+        $this->registerTipsTask();
     }
 
     protected function registerTipsTask()
