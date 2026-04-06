@@ -66,15 +66,15 @@ class ChangePasswordCommand extends SmartCommand
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
         SystemUtils::callEvent(new PlayerChangePasswordEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
-        $password = $args->getValue('old-password');
-        $passwordConfirm = $args->getValue('new-password');
+        $oldPassword = $args->getValue('old-password');
+        $newPassword = $args->getValue('new-password');
         $name = $sender->getName();
         Loader::getInstance()->getProvider()->changePassword(
             $name,
-            $password,
-            $passwordConfirm
+            $oldPassword,
+            $newPassword
         )->then(
-                function ($result) use ($password, $sender) {
+                function ($result) use ($newPassword, $sender) {
                     if (!SystemUtils::isValidPlayer($sender)) {
                         return;
                     }
@@ -83,10 +83,10 @@ class ChangePasswordCommand extends SmartCommand
                             throw $result;
                         }
                         $settings = Loader::getInstance()->getSettings();
-                        $passwordToShow = $password;
+                        $passwordToShow = $newPassword;
                         if ($settings->isHidePasswordEnabled()) {
                             $percent = $settings->getShowPasswordPercent();
-                            $passwordToShow = SystemUtils::hideChars($password, $percent);
+                            $passwordToShow = SystemUtils::hideChars($newPassword, $percent);
                         }
                         $sender->sendMessage(Loader::getInstance()->getMessages()->get('change-password-successfully', '{password}', $passwordToShow));
                     } catch (WrongPasswordException $error) {
