@@ -49,12 +49,17 @@ class LogoutCommand extends SmartCommand
 
     protected function prepare()
     {
-        $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule());
+        $this->registerRules(new OnlyInGameCommandRule());
     }
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
-        SessionController::getInstance()->getPlayerSession($sender)->destroy(false);
-        $sender->sendMessage(Loader::getInstance()->getMessages()->get('logout'));
+        if ($session = SessionController::getInstance()->getPlayerSession($sender)) {
+            $session->destroy(false);
+            $sender->sendMessage(Loader::getInstance()->getMessages()->get('logout'));
+            return;
+        }
+
+        $sender->sendMessage($this->getMessages()->get('no-logged-in'));
     }
 }

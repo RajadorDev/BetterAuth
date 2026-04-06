@@ -53,7 +53,10 @@ class RegisterAccountProcessAsyncTask extends AsyncPromiseTask
 
         $accountData = $safeVarValues['account'];
 
+        /** @var Account */
         $account = DynamicObject::globalUnserialize($accountData);
+
+        $account->save($safeVarValues['file_path']);
 
         return serialize(
             $account->jsonSerialize()
