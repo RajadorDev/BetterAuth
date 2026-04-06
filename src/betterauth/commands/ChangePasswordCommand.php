@@ -92,7 +92,7 @@ class ChangePasswordCommand extends SmartCommand
                     } catch (WrongPasswordException $error) {
                         $sender->sendMessage(Loader::getInstance()->getMessages()->get('wrong-password-confirm'));
                     } catch (AccountNotFoundException $error) {
-                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('account-not-found'));
+                        $sender->sendMessage(Loader::getInstance()->getMessages()->get('not-registered'));
                     }
                 }
             )->catch(

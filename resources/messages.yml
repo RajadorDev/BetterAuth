@@ -23,4 +23,5 @@ waiting-register: "Bem vindo! Para se registrar use: §f/register <senha: string
 no-logged-in: '§cVocê não está logado'
 wrong-password: '§cSenha errada!'
 move-blocked: "§cVocê precisa logar para poder se mover!"
+not-registered: "§cVocê não está registrado!"
 ...
