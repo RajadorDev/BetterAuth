@@ -66,10 +66,10 @@ auth-tips:
   enabled: true
   # Textos enviados como dica para o jogador se logar
   login:
-    tip: "§b§lBEM VINDO DE VOLTA §f{username}§r\n \n \n"
+    tip: "§b§lBEM VINDO DE VOLTA §f{username}§r\n \n \n "
     popup: "§7Você precisa se logar usando: §f/login <senha: string>"
   # Textos enviados como dica para o jogador se registrar
   register:
-    tip: "§b§lBEM VINDO §r§f{username}"
+    tip: "§b§lBEM VINDO §r§f{username}\n \n \n "
     popup: "§7Seja bem vindo! Se registre usando §f/register <senha: string> {password_confirmation}"
 ...
