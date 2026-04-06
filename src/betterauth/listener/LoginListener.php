@@ -134,6 +134,8 @@ final class LoginListener implements Listener
                 Loader::getInstance()->getProvider()->updateAccount($account);
             }
 
+            Loader::getInstance()->teleportToLobby($player);
+
         }
 
         LoginAttempts::clear($player);
