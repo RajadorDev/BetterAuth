@@ -20,6 +20,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -65,6 +66,17 @@ final class AuthListener implements Listener
         if (isset($commandLine[0]) && $commandLine[0] === '/' && !SessionController::getInstance()->isLoggedIn($event->getPlayer()) && !$this->loader->isAuthCommand($commandLine)) {
             $this->message->send($event->getPlayer(), 'not-logged-in-command');
 
+            $event->setCancelled(true);
+        }
+    }
+
+    /**
+     * @priority LOWEST
+     * @ignoreCancelled TRUE
+     */
+    public function onChat(PlayerChatEvent $event)
+    {
+        if (!$this->session->isLoggedIn($event->getPlayer())) {
             $event->setCancelled(true);
         }
     }
