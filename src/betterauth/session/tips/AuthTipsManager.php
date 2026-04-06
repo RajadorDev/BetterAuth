@@ -60,7 +60,7 @@ class AuthTipsManager extends PluginTask
 
         $popupText = str_replace(
             '{password_confirmation}',
-            '<confirmar_senha: string>',
+            $settings->needToConfirmPassword() ? '<password_confirmation: string>' : '',
             $popupText
         );
 

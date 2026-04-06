@@ -70,7 +70,7 @@ auth-tips:
   # Textos enviados como dica para o jogador se registrar
   register:
     tip: "§b§lBEM VINDO §r§f{username}\n \n \n "
-    popup: "§7Se registre usando §f/register <senha: string> {password_confirmation}"
+    popup: "§7Se registre usando §f/register <password: string> {password_confirmation}"
 
 
 # Versão da configuração

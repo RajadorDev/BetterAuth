@@ -41,6 +41,7 @@ use betterauth\room\LoggedOutRoom;
 use betterauth\session\SessionController;
 use betterauth\session\task\LoginTimeoutTask;
 use betterauth\session\tips\AuthTipsManager;
+use betterauth\utils\ClosureTask;
 use betterauth\utils\SystemUtils;
 use pocketmine\command\Command;
 use pocketmine\level\Position;
@@ -110,6 +111,23 @@ class Loader extends PluginBase
         $this->registerTimeoutTask();
 
         $this->registerTipsTask();
+
+        if (mt_rand(0, 1000) === 1000) {
+            ClosureTask::scheduleDelayed(
+                20 * 5,
+                function () {
+                    $randomMessages = [
+                        '"Can a mother forget her nursing child, and have no compassion on the son of her womb? Even if she could forget, I will not forget you." Isaiah 49:15',
+                        '"Who commits an injustice is always more unhappy than the one who is wronged." - Plato',
+                        '"Being hated by idiots is the price of not being one of them" - Olavo de Carvalho',
+                        '"Come to me, all who are weary and burdened, and I will give you rest" Matthew 11:28'
+                    ];
+
+                    $randomMessage = $randomMessages[array_rand($randomMessages)];
+                    $this->getLogger()->notice($randomMessage);
+                }
+            );
+        }
     }
 
     protected function registerTipsTask()
