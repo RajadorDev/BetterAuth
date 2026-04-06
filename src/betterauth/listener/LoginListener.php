@@ -29,6 +29,7 @@ use betterauth\event\PlayerLoggedOutEvent;
 use betterauth\event\PlayerLoginSucessfullyEvent;
 use betterauth\event\PlayerRegisterEvent;
 use betterauth\Loader;
+use betterauth\provider\Account;
 use betterauth\session\AuthTimeout;
 use betterauth\session\LoginAttempts;
 use betterauth\session\SessionController;
@@ -124,21 +125,14 @@ final class LoginListener implements Listener
                 $player->setNameTagVisible(false);
             }
 
-            Loader::getInstance()->getProvider()->isRegistered(
-                $player->getName()
-            )->then(
-                function (bool $isPlayerRegistered) use ($player) {
-                    if (!SystemUtils::isValidPlayer($player)) {
-                        return;
-                    }
+            if (AuthTipsManager::isEnabled()) {
+                AuthTipsManager::getInstance()->addPlayerTip($player, Settings::AUTH_TIPS_REGISTER);
 
-                    
-                    if (AuthTipsManager::isEnabled()) {
-                        $tipId = $isPlayerRegistered ? Settings::AUTH_TIPS_LOGIN : Settings::AUTH_TIPS_REGISTER;
-                        AuthTipsManager::getInstance()->addPlayerTip($player, $tipId);
-                    }
-                }
-            );
+                $account = $event->getSession()->getAccount();
+                $account->clearClientId();
+
+                Loader::getInstance()->getProvider()->updateAccount($account);
+            }
 
         }
 
