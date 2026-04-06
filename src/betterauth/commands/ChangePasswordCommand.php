@@ -58,16 +58,16 @@ class ChangePasswordCommand extends SmartCommand
     protected function prepare()
     {
         $this->setPrefix(Loader::getInstance()->getSettings()->getPrefix());
-        $this->registerArgument(0, new PasswordArgument('password', true));
-        $this->registerArgument(1, new PasswordArgument('password-confirm', true));
+        $this->registerArgument(0, new PasswordArgument('old-password', true));
+        $this->registerArgument(1, new PasswordArgument('new-password', true));
         $this->registerRules(new OnlyInGameCommandRule(), new CooldownRule(1000, true));
     }
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
         SystemUtils::callEvent(new PlayerChangePasswordEvent($sender, SessionController::getInstance()->getPlayerSession($sender)->getAccount()));
-        $password = $args->getValue('password');
-        $passwordConfirm = $args->getValue('password-confirm');
+        $password = $args->getValue('old-password');
+        $passwordConfirm = $args->getValue('new-password');
         $name = $sender->getName();
         Loader::getInstance()->getProvider()->changePassword(
             $name,
