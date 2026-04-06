@@ -49,7 +49,7 @@ class LoginCommand extends SmartCommand
             'login',
             'Log-in the server',
             self::DEFAULT_USAGE_PREFIX,
-            ['logar'],
+            ['logar', 'loga', 'l'],
             $commandMessages
         );
     }

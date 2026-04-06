@@ -48,7 +48,7 @@ class RegisterCommand extends SmartCommand
             'register',
             'register in ther server',
             self::DEFAULT_USAGE_PREFIX,
-            ['registrar'],
+            ['registrar', 'registra', 'reg', 'r', 'registe'],
             $commandMessages
         );
     }

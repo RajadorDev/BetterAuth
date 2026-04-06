@@ -43,7 +43,7 @@ class LogoutCommand extends SmartCommand
             'logout',
             'logout of ther server',
             self::DEFAULT_USAGE_PREFIX,
-            [],
+            ['deslogar'],
             $commandMessages
         );
     }
