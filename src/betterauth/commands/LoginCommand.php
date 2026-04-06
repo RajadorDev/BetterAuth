@@ -58,6 +58,7 @@ class LoginCommand extends SmartCommand
 
     protected function prepare()
     {
+        $this->setPrefix(Loader::getInstance()->getSettings()->getPrefix());
         $this->registerArgument(0, new PasswordArgument('password', true));
         $this->registerRules(new OnlyInGameCommandRule(), new NotLoggedInCommandRule(), new CooldownRule(CooldownRule::secondsToMs(1)));
     }
