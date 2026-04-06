@@ -5,7 +5,6 @@
 # Created by: Rajador, Bietio, NATANBX0
 #
 
-
 # Prefixo das mensagens enviada aos jogadores
 prefix: '§a§lBETTER§bAUTH  §r§7'
 
@@ -72,4 +71,10 @@ auth-tips:
   register:
     tip: "§b§lBEM VINDO §r§f{username}\n \n \n "
     popup: "§7Se registre usando §f/register <senha: string> {password_confirmation}"
+
+
+# Versão da configuração
+# Isso será usado no futuro para atualizar as suas configurações automaticamente
+# (NÃO ALTERE ISSO, É PARA USO INTERNO DO PLUGIN)
+config-version: 1
 ...
