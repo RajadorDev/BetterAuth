@@ -92,6 +92,7 @@ class Loader extends PluginBase
         $this->settings = new Settings($this->getConfig());
 
 
+        /** Maybe some mysql provider soon... */
         $accountsFolder = $dir . 'accounts' . DIRECTORY_SEPARATOR;
         $fileProvider = new FileAccountProvider($accountsFolder);
         $this->setProvider($fileProvider);
