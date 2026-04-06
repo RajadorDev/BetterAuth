@@ -40,6 +40,7 @@ use betterauth\provider\types\file\FileAccountProvider;
 use betterauth\room\LoggedOutRoom;
 use betterauth\session\SessionController;
 use betterauth\session\task\LoginTimeoutTask;
+use betterauth\session\tips\AuthTipsManager;
 use betterauth\utils\SystemUtils;
 use pocketmine\command\Command;
 use pocketmine\Player;
@@ -105,6 +106,13 @@ class Loader extends PluginBase
         $this->tryAutoUpdate();
 
         $this->registerTimeoutTask();
+    }
+
+    protected function registerTipsTask()
+    {
+        if ($this->settings->isAuthTipsEnabled()) {
+            AuthTipsManager::init($this);
+        }
     }
 
     protected function registerTimeoutTask()

@@ -65,6 +65,18 @@ class Settings
 
     const HIDE_NAMETAG = 'hide-loggout-players';
 
+    const AUTH_TIPS_PREFIX = 'auth-tips.';
+
+    const AUTH_TIPS_ENABLED = self::AUTH_TIPS_PREFIX . 'enabled';
+
+    const AUTH_TIPS_LOGIN = self::AUTH_TIPS_PREFIX . 'login';
+
+    const AUTH_TIPS_REGISTER = self::AUTH_TIPS_PREFIX . 'register';
+
+    const AUTH_TIPS_TIP_TEXT = 'tip';
+
+    const AUTH_TIPS_POPUP_TEXT = 'popup'; 
+
     /** @var Config */
     protected $file;
 
@@ -168,6 +180,16 @@ class Settings
     public function hideLoggoutPlayersNametag() : bool 
     {
         return $this->getBool(self::HIDE_NAMETAG, true, false);
+    }
+
+    public function isAuthTipsEnabled() : bool 
+    {
+        return $this->getBool(self::AUTH_TIPS_ENABLED, true, true);
+    }
+
+    public function getAuthTipTextValue(string $typeIdentifier, string $settingName) : string 
+    {
+        return $this->getString($typeIdentifier . '.' . $settingName, '', true);
     }
 
 }

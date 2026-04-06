@@ -33,6 +33,7 @@ use betterauth\session\AuthTimeout;
 use betterauth\session\LoginAttempts;
 use betterauth\session\SessionController;
 use betterauth\session\task\LoginTimeoutTask;
+use betterauth\session\tips\AuthTipsManager;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
 use betterauth\utils\SystemUtils;
@@ -112,6 +113,22 @@ final class LoginListener implements Listener
                 $player->setNameTagVisible(false);
             }
 
+            Loader::getInstance()->getProvider()->isRegistered(
+                $player->getName()
+            )->then(
+                function (bool $isPlayerRegistered) use ($player) {
+                    if (!SystemUtils::isValidPlayer($player)) {
+                        return;
+                    }
+
+                    
+                    if (AuthTipsManager::isEnabled()) {
+                        $tipId = $isPlayerRegistered ? Settings::AUTH_TIPS_REGISTER : Settings::AUTH_TIPS_LOGIN;
+                        AuthTipsManager::getInstance()->addPlayerTip($player, $tipId);
+                    }
+                }
+            );
+
         }
 
         LoginAttempts::clear($player);
@@ -147,14 +164,20 @@ final class LoginListener implements Listener
 
                 if ($result) {
                     $message = $this->messages->get('waiting-login');
+                    $tipId = Settings::AUTH_TIPS_LOGIN;
                 } else {
                     $confimationFormat = '';
                     if ($this->settings->needToConfirmPassword()) {
                         $confimationFormat = '<confirmar_senha: string>';
                     }
                     $message = $this->messages->get('waiting-register', '{confirmation}', $confimationFormat);
+                    $tipId = Settings::AUTH_TIPS_REGISTER;
                 }
                 $player->sendMessage($message);
+
+                if (AuthTipsManager::isEnabled()) {
+                    AuthTipsManager::getInstance()->addPlayerTip($player, $tipId);
+                }
             }
         )->catch(
             function () use ($player) {

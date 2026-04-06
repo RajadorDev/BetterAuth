@@ -8,7 +8,8 @@ use betterauth\provider\Account;
 use betterauth\session\exception\SessionAlreadyLoggedInException;
 use betterauth\session\Session;
 use betterauth\session\SessionController;
-
+use betterauth\session\task\LoginTimeoutTask;
+use betterauth\session\tips\AuthTipsManager;
 use betterauth\utils\Settings;
 use betterauth\utils\SystemMessages;
 use betterauth\utils\SystemUtils;
@@ -227,6 +228,14 @@ final class AuthListener implements Listener
         $session = $this->session->getPlayerSession($player);
         if ($session instanceof Session) {
             $session->destroy(true);
+        }
+
+        if (LoginTimeoutTask::isEnabled()) {
+            LoginTimeoutTask::getInstance()->removePlayer($player);
+        }
+
+        if (AuthTipsManager::isEnabled()) {
+            AuthTipsManager::getInstance()->removePlayer($player);
         }
     }
 }
