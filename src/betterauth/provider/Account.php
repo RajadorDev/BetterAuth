@@ -143,6 +143,16 @@ class Account extends PlayerPropertyDynamicObject
     }
 
     /**
+     * I'll use it soon when the player logout
+     *
+     * @return void
+     */
+    public function clearClientId()
+    {
+        $this->clientId = 0.0;
+    }
+
+    /**
      * @param string $rawCheckPassword
      * @param string $newPasswordRaw
      * @return true
