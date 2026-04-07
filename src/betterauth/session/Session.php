@@ -24,6 +24,7 @@ declare (strict_types=1);
 namespace betterauth\session;
 
 use betterauth\provider\Account;
+use InvalidArgumentException;
 use pocketmine\Player;
 
 class Session
@@ -68,6 +69,14 @@ class Session
     public function getAccount() : Account
     {
         return $this->account;
+    }
+
+    public function updateAccount(Account $account)
+    {
+        if ($account->getUsername(true) !== $this->account->getUsername(true)) {
+            throw new InvalidArgumentException("Account {$account->getUsername()} is not valid to {$this->account->getUsername()}");
+        }
+        $this->account = $account;
     }
 
     public function wasLoggedInAutomatically() : bool 

@@ -163,7 +163,7 @@ class Account extends PlayerPropertyDynamicObject
     {
         if ($this->matchPassword($rawCheckPassword)) {
             $this->passwordEncrypted = static::encryptPassword($newPasswordRaw);
-            return;
+            return true;
         }
         throw new WrongPasswordException('');
     }

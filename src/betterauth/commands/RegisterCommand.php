@@ -65,9 +65,6 @@ class RegisterCommand extends SmartCommand
 
     protected function onRun(CommandSender $sender, string $label, CommandArguments $args)
     {
-        if (!is_null(SessionController::getInstance()->getPlayerSession($sender))) {
-            return;
-        }
         $password = $args->getValue('password');
         if ($args->has('password-confirm')) {
             $passwordConfirm = $args->getValue('password-confirm');
