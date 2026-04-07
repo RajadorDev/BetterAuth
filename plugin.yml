@@ -6,6 +6,6 @@ discord: rajadortv
 api: 2.0.0
 depend: [SmartCommand]
 softdepend: AutoPluginUpdater
-version: 1.0.0
+version: 1.0.1
 main: 'betterauth\Loader'
 ...
