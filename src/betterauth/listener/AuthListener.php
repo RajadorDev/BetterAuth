@@ -226,7 +226,7 @@ final class AuthListener implements Listener
         if ($event instanceof EntityDamageByEntityEvent) {
             $entityDamager = $event->getDamager();
 
-            if ($entityDamager instanceof Player && !$this->session->isLoggedIn($entity)) {
+            if ($entityDamager instanceof Player && !$this->session->isLoggedIn($entityDamager)) {
                 $event->setCancelled(true);
             }
         }
